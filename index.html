@@ -2182,7 +2182,7 @@ const layerInfoTrunk=[
 ];
 
 // Zone layer limits
-const zoneMaxLayers={capota:1,firewall:2,doors_front:4,doors_rear:4,floor:2,trunk:null,roof:2,arch_front:2,arch_rear:2,trunk_main:4,trunk_door:3};
+const zoneMaxLayers={capota:1,firewall:2,doors_front:4,doors_rear:4,floor:2,trunk:null,roof:2,arch_front:2,arch_rear:2,trunk_main:3,trunk_door:3};
 
 // Zones displayed as pairs
 const zonePairSuffix={doors_front:" (ambele, ×2)",doors_rear:" (ambele, ×2)",arch_front:" (ambele, ×2)",arch_rear:" (ambele, ×2)"};
@@ -2194,7 +2194,7 @@ const qualityDef={
     layers:{
       1:[{p:"vibromax",c:1.0}],
       2:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85}],
-      3:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85},{p:"vibromax",c:0.70}],
+      3:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85},{p:"swell_foam5",c:0.60}],
       4:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85},{p:"vibromax",c:0.70},{p:"swell_foam5",c:0.50}]
     }
   },
@@ -2203,7 +2203,7 @@ const qualityDef={
     layers:{
       1:[{p:"earthiridium",c:1.0}],
       2:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85}],
-      3:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85},{p:"earthiridium",c:0.70}],
+      3:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85},{p:"swell15",c:0.60}],
       4:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85},{p:"earthiridium",c:0.70},{p:"swell15",c:0.50}]
     }
   },
@@ -2212,7 +2212,7 @@ const qualityDef={
     layers:{
       1:[{p:"earthgold",c:1.0}],
       2:[{p:"earthgold",c:1.0},{p:"baffle_zima",c:0.85}],
-      3:[{p:"earthgold",c:1.0},{p:"baffle_zima",c:0.85},{p:"earthgold",c:0.70}],
+      3:[{p:"earthgold",c:1.0},{p:"baffle_zima",c:0.85},{p:"swell_wave35",c:0.60}],
       4:[{p:"earthgold",c:1.0},{p:"baffle_zima",c:0.85},{p:"earthgold",c:0.70},{p:"swell_wave35",c:0.50}]
     }
   }
@@ -2229,20 +2229,20 @@ const qualityEV={
   pro:{layers:{
     1:[{p:"ev_silver",c:1.0}],
     2:[{p:"ev_silver",c:1.0},{p:"ev_integra",c:0.80}],
-    3:[{p:"ev_silver",c:1.0},{p:"ev_integra",c:0.80},{p:"ev_silver",c:0.60}],
+    3:[{p:"ev_silver",c:1.0},{p:"ev_integra",c:0.80},{p:"lace15",c:0.60}],
     4:[{p:"ev_silver",c:1.0},{p:"ev_integra",c:0.80},{p:"ev_silver",c:0.60},{p:"lace15",c:0.50}]
   }},
   luxury:{layers:{
     1:[{p:"ev_blue",c:1.0}],
     2:[{p:"ev_blue",c:1.0},{p:"ev_vbb",c:0.90}],
-    3:[{p:"ev_blue",c:1.0},{p:"ev_vbb",c:0.90},{p:"ev_blue",c:0.80}],
+    3:[{p:"ev_blue",c:1.0},{p:"ev_vbb",c:0.90},{p:"lace_expert",c:0.60}],
     4:[{p:"ev_blue",c:1.0},{p:"ev_vbb",c:0.90},{p:"ev_blue",c:0.80},{p:"lace_expert",c:0.50}]
   }}
 };
 
 // Trunk sub-zones config
 const trunkSubZones=[
-  {id:"trunk_main",name:"Podea + laterale portbagaj",icon:"🪵",desc:"Podeaua și pereții laterali ai portbagajului — materiale diferite pentru fiecare suprafață",maxLayers:4},
+  {id:"trunk_main",name:"Podea + laterale portbagaj",icon:"🪵",desc:"Podeaua și pereții laterali ai portbagajului — materiale diferite pentru fiecare suprafață",maxLayers:3},
   {id:"trunk_door",name:"Haion / Ușă spate",icon:"🚪",desc:"Materiale ușoare recomandate",maxLayers:3,note:"Se recomandă materiale ușoare pentru a nu suprasolicita telescoapele."}
 ];
 const trunkSubAreas={
@@ -2257,19 +2257,19 @@ const qualityTrunkFloor={
   basic:{layers:{
     1:[{p:"vibromax",c:1.0}],
     2:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85}],
-    3:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85},{p:"vibromax",c:0.70}],
+    3:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85},{p:"swell_foam5",c:0.60}],
     4:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85},{p:"vibromax",c:0.70},{p:"swell_foam5",c:0.50}]
   }},
   pro:{layers:{
     1:[{p:"earthiridium",c:1.0}],
     2:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85}],
-    3:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85},{p:"earthiridium",c:0.70}],
+    3:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85},{p:"swell15",c:0.60}],
     4:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85},{p:"earthiridium",c:0.70},{p:"swell_foam5",c:0.50}]
   }},
   luxury:{layers:{
     1:[{p:"earthgold",c:1.0}],
     2:[{p:"earthgold",c:1.0},{p:"neoprene6",c:0.85}],
-    3:[{p:"earthgold",c:1.0},{p:"neoprene6",c:0.85},{p:"earthgold",c:0.70}],
+    3:[{p:"earthgold",c:1.0},{p:"neoprene6",c:0.85},{p:"swell_wave35",c:0.60}],
     4:[{p:"earthgold",c:1.0},{p:"neoprene6",c:0.85},{p:"earthgold",c:0.70},{p:"swell_foam5",c:0.50}]
   }}
 };
@@ -2309,15 +2309,20 @@ const qualityVibro={
 // EV Elite — adaugat dupa qualityVibro pentru a evita TDZ
 qualityDef.ev_elite={
   name:"EV Electra",icon:"⚡",
-  desc:"Dr. Artex EV Blue + EV VibroBarrier + Lace Expert — materiale ultra-ușoare, concepute pentru vehicule electrice",
-  layers:qualityEV.luxury.layers
+  desc:"Dr. Artex EV Silver / EV Blue + EV VibroBarrier + Lace Expert — materiale ultra-ușoare, concepute pentru vehicule electrice",
+  layers:{
+    1:[{p:"ev_silver",c:1.0}],
+    2:[{p:"ev_silver",c:1.0},{p:"ev_integra",c:0.80}],
+    3:[{p:"ev_blue",c:1.0},{p:"ev_vbb",c:0.90},{p:"lace_expert",c:0.60}],
+    4:[{p:"ev_blue",c:1.0},{p:"ev_vbb",c:0.90},{p:"lace_expert",c:0.60},{p:"ev_blue",c:0.50}]
+  }
 };
 qualityVibro.ev_elite={
   name:"EV Electra",icon:"⚡",
-  desc:"Dr. Artex EV Blue — antivibrații EV ultra-ușoare",
+  desc:"Dr. Artex EV Silver — antivibrații EV ultra-ușoare",
   layers:{
-    1:[{p:"ev_blue",c:1.0}],
-    2:[{p:"ev_blue",c:1.0},{p:"ev_blue",c:0.85}]
+    1:[{p:"ev_silver",c:1.0}],
+    2:[{p:"ev_silver",c:1.0},{p:"ev_silver",c:0.85}]
   }
 };
 // Zone care folosesc DOAR vibro absorbant (fără fono/termic)
@@ -2402,7 +2407,7 @@ function getLaborBadgeHtml(ronAmount, prefix){
   return `<div style="display:inline-flex;align-items:center;gap:6px;background:#fff9f0;border:1.5px solid #f0a500;
     border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:#b8680a;margin-bottom:10px">
     ${p} <strong>~${ronAmount.toLocaleString('ro-RO')} RON</strong>
-    <span style="font-size:9px;font-weight:400;color:#c78a20">· inclus la finalizare</span>
+    <span style="font-size:9px;font-weight:400;color:#c78a20">· poate fi adăugat la finalizare</span>
   </div>`;
 }
 function getLaborCost(){
@@ -3846,6 +3851,12 @@ function calcQualityPrice(q){
 function isDoorZone(){return doorZones.includes(currentZone);}
 function isPartialApplicable(){return currentQuality==="basic"&&isDoorZone();}
 
+function getQualityDescForLayers(q){
+  const layers=getQualityLayers(q);
+  if(!layers||!layers.length) return "";
+  const names=layers.map(l=>prods[l.p]?prods[l.p].name:l.p);
+  return names.join(" + ");
+}
 function renderStep2(){
   const area=getArea();
   let sunroofNote="";
@@ -3865,7 +3876,7 @@ function renderStep2(){
       <span class="qcard-icon">${qd.icon}</span>
       <div class="qcard-info">
         <div class="qcard-name">${qd.name}</div>
-        <div class="qcard-desc">${qd.desc}</div>
+        <div class="qcard-desc">${getQualityDescForLayers(q)||qd.desc}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
         <div class="qcard-price">~${price} RON</div>
@@ -3888,7 +3899,7 @@ function renderStep2(){
       <span class="qcard-icon">⚡</span>
       <div class="qcard-info">
         <div class="qcard-name" style="color:${evActive?'#fff':'#004d40'}">EV Electra</div>
-        <div class="qcard-desc" style="color:${evActive?'rgba(255,255,255,.85)':'#00695c'}">Dr. Artex EV Blue + EV VibroBarrier + Lace Expert — ultra-ușoare</div>
+        <div class="qcard-desc" style="color:${evActive?'rgba(255,255,255,.85)':'#00695c'}">${getQualityDescForLayers('ev_elite')||'EV Blue + EV VibroBarrier — ultra-ușoare'}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
         <div class="qcard-price" style="color:${evActive?'#fff':'#00897b'}">~${evPrice} RON</div>
@@ -3994,7 +4005,7 @@ function renderPartialChoice(){
       <div onclick="basicSubMode='partial';addZoneToCart()" style="border:1.5px solid var(--border);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;background:#fff">
         <div style="font-size:22px;margin-bottom:4px">🎵</div>
         <div style="font-size:12px;font-weight:800">Doar difuzor</div>
-        <div style="font-size:10px;color:#555;margin-top:4px;line-height:1.4">Antivibrații doar pentru difuzor — variantă parțială</div>
+        <div style="font-size:10px;color:#555;margin-top:4px;line-height:1.4">Antivibrații pe zona din jurul difuzorului — creează o incintă fonică pentru bass mai curat</div>
         <div style="font-size:14px;font-weight:800;color:var(--red);margin-top:8px">~${pricePart} RON</div>
       </div>
     </div>
