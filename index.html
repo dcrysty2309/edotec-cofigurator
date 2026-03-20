@@ -2314,9 +2314,14 @@ function getLaborAgeAdjustmentMeta(){
   const yr=parseInt(selYear)||CURRENT_MODEL_YEAR;
   const age=CURRENT_MODEL_YEAR-yr;
   let mult=1.0;
-  if(isCatalogOver20kWhenNew(selBrand,selModel,yr)){
-    if(age<=1) mult=1.30;
-    else if(age<=2) mult=1.20;
+  // Modelele cu demontare tablă sunt mașini vechi — nu li se aplică ajustarea de vârstă
+  // ci doar +30% specific pentru demontare (aplicat per zonă în getLaborEstimateForItem)
+  if(!requiresDoorDisassembly()){
+    // Ajustare pe vârsta mașinii — se aplică TUTUROR mașinilor ≤3 ani
+    if(age<=1) mult=1.30;       // mașină curentă sau 1 an veche
+    else if(age===2) mult=1.20; // 2 ani veche
+    else if(age===3) mult=1.10; // 3 ani veche
+    // Peste 3 ani: fără ajustare (mult rămâne 1.0)
   }
   let publicLabel='Ajustare standard';
   if(mult>=1.30) publicLabel='Ajustare 3';
