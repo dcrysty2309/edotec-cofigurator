@@ -1012,6 +1012,12 @@ body.desktop-flow .desktop-step.is-info .desktop-step-nr{background:#eaded1;colo
     </div>
   </div>
   <div class="hdr-right">
+    <select id="lang-select" onchange="setLang(this.value)" style="padding:7px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:var(--text);cursor:pointer;outline:none;min-height:36px;appearance:none;-webkit-appearance:none;text-align:center">
+      <option value="ro">🇷🇴 RO</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="hu">🇭🇺 HU</option>
+      <option value="bg">🇧🇬 BG</option>
+    </select>
     <button class="theme-toggle" id="theme-toggle" type="button" onclick="toggleTheme()">
       <span class="theme-toggle-ic" id="theme-toggle-ic">🌙</span>
     </button>
@@ -1529,6 +1535,352 @@ body.desktop-flow .desktop-step.is-info .desktop-step-nr{background:#eaded1;colo
 </div>
 
 <script>
+// ════════════════════════════════════════
+// i18n — Multilingual Support (RO/EN/HU/BG)
+// ════════════════════════════════════════
+const LANG={
+ro:{
+pageTitle:"Configurator Insonorizare Auto | EdoTec",headerSub:"Configurator Insonorizare",cartBtnTxt:"Coș",finalize:"Finalizează",
+step1Strong:"Mașină",step1Small:"alegi vehiculul și tipul de propulsie",step2Strong:"Zone",step2Small:"mapezi exact ce vrei să insonorizezi",step3Strong:"Opțiuni finale",step3Small:"se aleg direct în pasul 2, nu ca ecran separat",
+selectCar:"Selectează mașina",lbBrand:"Marcă",lbModel:"Model",lbYear:"An",lbBodyType:"Forma caroseriei",phBrand:"— marcă —",phModel:"— model —",phYear:"— an —",continueZones:"Continuă la selectare zone →",zonesCfgTitle:"Zone configurate",noZoneSel:"Nicio zonă selectată",
+propCombustie:"Combustie",propElectric:"Electric / Hibrid",versionPromptTitle:"Trebuie să ne spui și ce fel de versiune este.",versionPromptCopy:"Alege varianta corectă a caroseriei, iar configuratorul continuă automat.",editCar:"✏️ Schimbă",
+heroTitle:'Calculează în <span class="hero-title-accent">2 minute</span> costul insonorizării mașinii tale.',heroFast:"Configurare rapidă",heroPrice:"Preț instant",
+mapCtaTitle:"Apasă pe zona pe care vrei s-o insonorizezi",mapCtaSub:"Selectează mai întâi mașina și tipul motorului",
+mgTitle:"Poți continua în 3 moduri",mgCopy:"Alege mai întâi cum vrei să configurezi: manual pe zone, printr-un pachet popular sau direct pentru toată mașina.",mgManualTitle:"Pe zone",mgManualCopy:"Apeși direct pe mașină și alegi separat fiecare suprafață.",mgManualHint:"Selectează mai jos zonele dorite",mgPopTitle:"Pachete populare",mgPopCopy:"Combinații rapide, deja gândite pentru cele mai cerute scenarii.",mgPopMini:"Varianta rapidă",mgFullTitle:"Insonorizare completă",mgFullCopy:"Calculezi toată mașina dintr-un click, fără configurare manuală pe fiecare zonă.",mgFullMini:"Toată mașina",
+mobileHint:'Alege „Pe zone" pentru a activa punctele de pe mașină.',popBtnTitle:"Pachete Populare",popBtnSub:"Combinații recomandate",fullBtnTitle:"Insonorizare Completă",fullBtnSub:"Toate zonele, un singur click",
+z_capota:"Capotă",z_firewall:"Firewall (tablier)",z_doors_front:"Uși față",z_doors_rear:"Uși spate",z_floor:"Podea",z_trunk:"Portbagaj",z_roof:"Plafon",z_arch_front:"Carenaj față",z_arch_rear:"Carenaj spate",z_trunk_main:"Podea + laterale portbagaj",z_trunk_floor:"Podea portbagaj",z_trunk_sides:"Laterale portbagaj",z_trunk_door:"Ușă portbagaj",
+pin_capota:"Capotă",pin_doors_front:"Uși față ×2",pin_doors_rear:"Uși spate ×2",pin_roof:"Plafon",pin_floor:"Podea",pin_trunk:"Portbagaj",pin_arch_front:"Carenaj față ×2",pin_arch_rear:"Carenaj spate ×2",pairSuffix:" (ambele, ×2)",
+l1Label:"1 Strat",l1Desc:"Blochează vibrațiile și rezonanțele tablei",l2Label:"2 Straturi",l2Desc:"Antivibrație + izolare fonică",l3Label:"3 Straturi",l3Desc:"Antivibrații + izolare fonică + barieră termică",l4Label:"4 Straturi",l4Desc:"Sistem complet: antivibrație + barieră fonică + barieră termică + spumă fonoabsorbantă",
+tl1Desc:"Elimină vibrațiile și zgomotul metalic al podelei",tl2Desc:"Antivibrație + barieră fonică — reduce semnificativ zgomotul din spate",tl3Desc:"Antivibrație + barieră fonică + al 2-lea strat anti-vibrații — portbagaj mult mai liniștit",tl4Desc:"Pachet maxim: 2× antivibrație + barieră fonică + spumă fonoabsorbantă Swell Foam — izolare completă",
+howManyLayers:"Câte straturi de insonorizare vrei pentru",photoNote:"Fotografiile de produs vor fi adăugate ulterior",
+encAdd1:"Adăugând un strat în plus",encAddN:"Adăugând încă {n} straturi",encText:"manopera crește foarte puțin — diferența e de doar <strong>{pct}%</strong>. Odată deschisă ușa, montajul straturilor suplimentare nu adaugă mult timp. Poți regreta ulterior că nu ai ales mai mult! 🎵",
+doorDisasmTitle:"Verificare necesară la preluarea clientului",doorDisasmNote:"accesul la tabla exterioară a ușii necesită demontarea tablei intermediare și a macaralei de geam. <strong>Acest lucru poate influența manopera — costul poate fi mai mare</strong> față de estimarea standard. Colegii noștri vor verifica pentru tine înainte să te sune.",doorDisasmNoteModel:"face parte din modelele care necesită demontare. ",
+roofQ:"Plafonul tău are trapă? Selectează tipul pentru a calcula suprafața corectă.",noSunroof:"Fără trapă",noSunroofDesc:"Suprafață completă de plafon",noSunroofBadge:"100% suprafață",normalSunroof:"Trapă normală",normalSunroofDesc:"Se scade 25% din suprafața de material",normalSunroofBadge:"-25% suprafață",panoramicSunroof:"Trapă panoramică",panoramicSunroofDesc:"Se scade 50% din suprafața de material",panoramicSunroofBadge:"-50% suprafață",continueArrow:"Continuă →",sunroofNormalLabel:"trapă normală (-25%)",sunroofPanoramicLabel:"trapă panoramică (-50%)",roofHintTitle:"Alege tipul de trapă",roofHintCopy:"Suprafața utilă a plafonului se recalculează automat în funcție de trapă, apoi continui la materialele potrivite.",
+q_basicDesc:"Dr. Artex VibroMax + Audio System Neoprene — entry-level, raport excelent calitate/preț",q_proDesc:"Dr. Artex Earth Iridium + Baffle Integra — performanță bună, raport calitate/preț ridicat",q_luxuryDesc:"Dr. Artex Earth Gold HD + Baffle Zima + Swell Wave 35 — performanță maximă",q_evDesc:"Dr. Artex EV Silver / EV Blue + EV VibroBarrier + Lace Expert — materiale ultra-ușoare, concepute pentru vehicule electrice",
+q_vibroBasicDesc:"Dr. Artex OEM VibroMax — antivibrații entry-level",q_vibroProDesc:"Dr. Artex Earth Iridium — antivibrații standard 2mm",q_vibroLuxuryDesc:"Dr. Artex Earth Gold HD — antivibrații premium 2.6mm",q_vibroEvDesc:"Dr. Artex EV Silver — antivibrații EV ultra-ușoare",
+evGamLabel:"⚡ Gamă pentru mașini electrice — materiale ultra-ușoare",evDefault:"EV Blue + EV VibroBarrier — ultra-ușoare",
+matIncluded:"Materiale incluse",layerN:"Stratul",priceNote:"📦 Preț estimat doar pentru materiale · include 10% surplus · manopera se calculează separat",
+doorCoverTitle:"Acoperire uși",justSpeaker:"Doar difuzor",justSpeakerDesc:"~40% suprafață",fullSurface:"Suprafață totală",fullSurfaceDesc:"100% ușă",
+partialTitle:"Acoperire uși față — Basic",fullDoorTitle:"Suprafață totală",fullDoorDesc:"Insonorizare completă a ușii — pentru confort",speakerTitle:"Doar difuzor",speakerDesc:"Antivibrații pe zona din jurul difuzorului — creează o incintă fonică pentru bass mai curat",backBtn:"← Înapoi",
+whyImportant:"De ce e important?",step1Label:"Pasul 1",step1HintCopy:"Alege numărul de straturi din stânga. După selecție, în dreapta apar materialele și prețurile.",trunkStep1HintCopy:"Alege numărul de straturi pentru această sub-zonă. După selecție, în dreapta apar materialele și estimarea.",
+trunkTitle:"Portbagaj",trunkSubQ:"Apasă pe o zonă pentru a o configura:",trunkDone:"✓ Gata cu portbagajul",trunkSelectTitle:"Selectează o sub-zonă",trunkSelectHint:"Podeaua, lateralele și haionul au construcții diferite, deci se configurează separat. După selecție, în dreapta apar materialele și estimările.",
+tsz_main_name:"Podea + laterale portbagaj",tsz_main_icon:"🪵",tsz_main_desc:"Podeaua și pereții laterali ai portbagajului — materiale diferite pentru fiecare suprafață",tsz_door_name:"Haion / Ușă spate",tsz_door_icon:"🚪",tsz_door_desc:"Materiale ușoare recomandate",tsz_door_note:"Se recomandă materiale ușoare pentru a nu suprasolicita telescoapele.",
+sectionFloor:"🪵 Podea",sectionSides:"🧱 Laterale (max 9-10mm)",
+cartTitle:"🛒 Coșul tău",cartEmptyMsg:"Coșul este gol",totalMatLabel:"Total materiale:",totalMatShort:"Total materiale",checkoutBtn:"Finalizează →",continueBtn:"← Continuă",zonesCfg1:"zonă configurată",zonesCfgN:"zone configurate",
+summaryTitle:"Rezumat configurație",desktopEmptyZones:"Selectează zone →",inclAccess:"incl. accesorii",viewCartBtn:"🛒 Vezi coșul",
+needMoreSheets:"Ai nevoie de câteva coli în plus?",indivSheets:"+ Coli individuale",indivSheetsTitle:"Coli individuale",indivSheetsSub:"Adaugă coli extra din orice material, direct în coș.",totalSheetsLabel:"Total coli:",addToCartBtn:"🛒 Adaugă în coș",
+carChangedTitle:"⚠️ Mașina s-a schimbat",carChangedDefault:"Coșul conține configurații pentru altă mașină.",addForNew:"➕ Adaugă pentru mașina nouă (păstrează ambele)",resetCartBtn:"🗑️ Resetează coșul și configurează din nou",cancelBtn:"✕ Anulează",
+vsTitle:"🚗 Schimbi mașina configurată",keepForPrev:"📦 Păstrează coșul pentru mașina anterioară",resetForNew:"🗑️ Golește coșul și pornesc pentru mașina nouă",
+zrBadge:"Înlocuire zonă",zrTitle:"Această zonă există deja în coș",zrCopy:"Ai deja această zonă configurată cu alte materiale. Vrei să înlocuim varianta existentă cu noua selecție?",keepFromCart:"Păstrează varianta din coș",replaceInCart:"Da, înlocuiește în coș",currentCfgLabel:"Configurația actuală",newCfgLabel:"Noua configurație",
+zeBadge:"Zonă configurată",zeTitle:"Zona este deja configurată",zeCopy:"Această zonă există deja în coș. Dacă vrei să o modifici, ștergem configurația actuală și o iei de la zero.",keepCurrentBtn:"Păstrează varianta actuală",editFromZero:"Da, modific de la zero",
+psBadge:"Schimbare flux",stayOnZones:"Rămân pe zonele configurate",cfgZonesBadge:"Zone deja configurate",
+chkSummaryTitle:"🛒 Rezumat comandă",chkVerify:"Verifică materialele înainte de finalizare",chkNeedInstall:"Ai nevoie și de montaj?",chkWithInstallTitle:"Da, vreau montaj profesional",chkWithInstallDesc:"Calculăm costul manoperei pentru mașina ta",chkDiyTitle:"Nu, îl montez eu singur",chkDiyDesc:"Acces la librăria video de tutoriale gratuite",
+chkLaborTitle:"🔧 Manoperă estimativă",chkLaborTotalEst:"Total manoperă estimat",chkLaborAfterDisc:"Total montaj după reducere",chkTotalMatLabor:"TOTAL (materiale + montaj)",chkLaborNote:"* Prețul final de manoperă va fi confirmat de echipa EdoTec la programare.",
+diyTitle:"🔧 Faci montajul singur?",diySub:"Aceste produse îți vor fi utile pentru un montaj profesional",diyBonus:"Bonus: vei primi pe e-mail acces la o librărie video cu instrucțiuni despre cum se aplică materialul insonorizant.",diyAllPack:"Pachet complet — toate 6 produse",diySavings:"Economisești",diySavingsPost:"RON față de prețul individual",diyTotalSel:"Total scule selectate:",diyAddBtn:"✅ Adaugă sculele și continuă →",diySkipBtn:"Continuă fără scule →",
+citySelectTitle:"📍 Unde vrei montajul?",citySelectSub:"Selectează orașul din lista centrelor de montaj disponibile",
+cfTitle:"📋 Datele tale de contact",cfSub:"Necesare pentru oferta pe care o transmitem echipei noastre",cfFirstName:"Prenume",cfLastName:"Nume",cfPhone:"📱 Telefon",cfEmail:"Email",cfAddress:"📬 Adresă",cfCity:"Oraș",cfCounty:"Județ",cfContinueBtn:"Continuă → Metodă de plată",
+errFirstLast:"Completează prenumele și numele.",errPhone:"Telefon invalid (ex: 0740 123 456).",errEmail:"Email invalid.",errAddress:"Completează adresa.",errCity:"Completează orașul.",errCounty:"Completează județul.",
+payTitle:"💳 Metoda de plată",paySub:"Selectează cum dorești să plătești — se va aplica automat la pasul următor",paySoon:"În curând disponibil",payErrMsg:"Selectează o metodă de plată.",
+delTitle:"📦 Unde livrăm produsele?",delSub:"Alege locul de livrare pentru materialele de insonorizare",delSelectMsg:"Selectează o metodă de livrare",finalizeOrderBtn:"✅ Finalizează comanda →",
+thankYouTitle:"Mulțumim, {name}! 🎉",successMsg:"Comanda ta a fost înregistrată cu succes.",successMsg2:"Un coleg din echipa EdoTec te va contacta <strong>în cel mai scurt timp</strong> pentru a confirma detaliile și a stabili livrarea.",orderSumSmall:"📋 Sumar comandă",emailConfirmSent:"✉️ Confirmare trimisă pe email",closeSuccess:"✨ Închide — ne vedem curând!",
+discBarTitle:"🎯 Reduceri automate materiale",
+mcTitle:"Cum vrei să configurezi insonorizarea mașinii?",mcCopy:"Poți merge pe configurare detaliată, poți alege un pachet deja gândit sau poți calcula direct insonorizarea completă. Alege varianta care ți se potrivește și o poți schimba ulterior.",mcManualTitle:"Configurezi pe zone",mcManualCopy:"Apeși direct pe mașină și alegi separat straturile și materialele pentru fiecare suprafață.",mcManualSpan:"Control maxim",mcPkgTitle:"Pachete populare",mcPkgCopy:"Primești combinații deja pregătite, utile dacă vrei să alegi rapid una dintre variantele cele mai cerute.",mcPkgSpan:"Rapid și simplu",mcFullTitle:"Insonorizare completă",mcFullCopy:"Calculezi dintr-un click varianta completă pentru mașina aleasă, fără configurare manuală pe fiecare zonă.",mcFullSpan:"Toată mașina",
+toastSelectCar:"Selectează mai întâi mașina!",toastSelectEngine:"Selectează mai întâi marca, modelul și tipul motorului!",toastEmptyCart:"Coșul este gol!",toastAddSheet:"Adaugă cel puțin o coală!",toastSheetsAdded:"✓ Coli adăugate în coș!",toastSessionRestored:"✅ Sesiunea ta a fost restaurată!",toastPrevCleaned:"Selecția anterioară a fost ștearsă. Poți continua cu pachetul ales.",toastAdded:"adăugat în coș!",toastAlreadyInCart:"Zona este deja în coș cu aceeași configurație.",
+fpTitle:"🚗 Pachet Complet",fpChooseQ:"Alege calitatea materialelor",fpSelectFirst:"🛒 Selectează o calitate mai întâi",fpAddCart:"🛒 Adaugă în coș",fpLaborTitle:"Estimare manoperă montaj",fpLaborDesc:"Poți alege la pasul următor dacă vrei instalare profesională",fpZonesDetail:"▾ Zone incluse ({n} zone, ~{a} m²)",fpEstNote:"* Estimare. Prețul final depinde de starea mașinii și instalatorul ales.",
+ppTitle:"🎯 Pachete Populare",ppChoosePkg:"Alege combinația potrivită pentru tine",ppNote:"* Click pe material pentru a-l adăuga direct în coș · include 10% surplus · manopera la pasul următor",ppBack:"← Înapoi",
+stratLabel:"Strat",noCarLabel:"Mașină nespecificată",laborBadge:"🔧 Montaj estimat:",laborBadgePost:"· poate fi adăugat la finalizare",stratStr:"strat",straturiStr:"straturi",
+doorsPartialSuffix:" (doar difuzor)",roofNormalSuffix:" (trapă)",roofPanoramicSuffix:" (trapă panoramică)",portbagajPrefix:"Portbagaj — ",maxLayersN:"{n} straturi",maxLayers1:"1 strat",listenWithSound:"Ascultă cu sunet",
+pkgMaterialsAdded:"(materiale) adăugat în coș!",pkgWithLaborAdded:"+ manoperă adăugate în coș!",
+},
+en:{
+pageTitle:"Car Sound Insulation Configurator | EdoTec",headerSub:"Insulation Configurator",cartBtnTxt:"Cart",finalize:"Checkout",
+step1Strong:"Vehicle",step1Small:"select your car and engine type",step2Strong:"Zones",step2Small:"map exactly what you want to insulate",step3Strong:"Final options",step3Small:"selected directly in step 2, not as a separate screen",
+selectCar:"Select your vehicle",lbBrand:"Brand",lbModel:"Model",lbYear:"Year",lbBodyType:"Body style",phBrand:"— brand —",phModel:"— model —",phYear:"— year —",continueZones:"Continue to zone selection →",zonesCfgTitle:"Configured zones",noZoneSel:"No zone selected",
+propCombustie:"Combustion",propElectric:"Electric / Hybrid",versionPromptTitle:"Please tell us what version this is.",versionPromptCopy:"Choose the correct body variant and the configurator will continue automatically.",editCar:"✏️ Change",
+heroTitle:'Calculate the cost of your car\'s sound insulation in <span class="hero-title-accent">2 minutes</span>.',heroFast:"Quick configuration",heroPrice:"Instant price",
+mapCtaTitle:"Click on the zone you want to insulate",mapCtaSub:"Select your car and engine type first",
+mgTitle:"You can continue in 3 ways",mgCopy:"First choose how you want to configure: manually by zone, through a popular package, or directly for the whole car.",mgManualTitle:"By zones",mgManualCopy:"Click directly on the car and choose each surface separately.",mgManualHint:"Select zones below",mgPopTitle:"Popular packages",mgPopCopy:"Quick combinations, already designed for the most requested scenarios.",mgPopMini:"Quick option",mgFullTitle:"Full insulation",mgFullCopy:"Calculate the whole car in one click, without manual configuration for each zone.",mgFullMini:"Whole car",
+mobileHint:"Choose \"By zones\" to activate the dots on the car.",popBtnTitle:"Popular Packages",popBtnSub:"Recommended combinations",fullBtnTitle:"Full Insulation",fullBtnSub:"All zones, one click",
+z_capota:"Hood",z_firewall:"Firewall (dashboard)",z_doors_front:"Front doors",z_doors_rear:"Rear doors",z_floor:"Floor",z_trunk:"Trunk",z_roof:"Roof",z_arch_front:"Front arches",z_arch_rear:"Rear arches",z_trunk_main:"Trunk floor + sides",z_trunk_floor:"Trunk floor",z_trunk_sides:"Trunk sides",z_trunk_door:"Trunk door",
+pin_capota:"Hood",pin_doors_front:"Front doors ×2",pin_doors_rear:"Rear doors ×2",pin_roof:"Roof",pin_floor:"Floor",pin_trunk:"Trunk",pin_arch_front:"Front arches ×2",pin_arch_rear:"Rear arches ×2",pairSuffix:" (both, ×2)",
+l1Label:"1 Layer",l1Desc:"Blocks vibrations and sheet metal resonances",l2Label:"2 Layers",l2Desc:"Anti-vibration + sound isolation",l3Label:"3 Layers",l3Desc:"Anti-vibration + sound isolation + thermal barrier",l4Label:"4 Layers",l4Desc:"Complete system: anti-vibration + sound barrier + thermal barrier + absorbing foam",
+tl1Desc:"Eliminates vibrations and metallic noise from the floor",tl2Desc:"Anti-vibration + sound barrier — significantly reduces rear noise",tl3Desc:"Anti-vibration + sound barrier + 2nd anti-vibration layer — much quieter trunk",tl4Desc:"Maximum package: 2× anti-vibration + sound barrier + Swell Foam absorbing foam — complete insulation",
+howManyLayers:"How many insulation layers do you want for",photoNote:"Product photos will be added later",
+encAdd1:"Adding one more layer",encAddN:"Adding {n} more layers",encText:"labor increases very little — the difference is only <strong>{pct}%</strong>. Once the door is open, adding more layers doesn't take much more time. You might regret not choosing more! 🎵",
+doorDisasmTitle:"Verification needed at customer pickup",doorDisasmNote:"access to the outer door panel requires removing the inner panel and window regulator. <strong>This can affect labor costs — the cost may be higher</strong> than the standard estimate. Our team will verify for you before calling.",doorDisasmNoteModel:"is part of the models that require disassembly. ",
+roofQ:"Does your roof have a sunroof? Select the type to calculate the correct surface.",noSunroof:"No sunroof",noSunroofDesc:"Full roof surface",noSunroofBadge:"100% surface",normalSunroof:"Normal sunroof",normalSunroofDesc:"25% of material surface deducted",normalSunroofBadge:"-25% surface",panoramicSunroof:"Panoramic sunroof",panoramicSunroofDesc:"50% of material surface deducted",panoramicSunroofBadge:"-50% surface",continueArrow:"Continue →",sunroofNormalLabel:"normal sunroof (-25%)",sunroofPanoramicLabel:"panoramic sunroof (-50%)",roofHintTitle:"Choose sunroof type",roofHintCopy:"The usable roof surface is automatically recalculated based on the sunroof, then you continue with the right materials.",
+q_basicDesc:"Dr. Artex VibroMax + Audio System Neoprene — entry-level, excellent quality/price ratio",q_proDesc:"Dr. Artex Earth Iridium + Baffle Integra — good performance, high quality/price ratio",q_luxuryDesc:"Dr. Artex Earth Gold HD + Baffle Zima + Swell Wave 35 — maximum performance",q_evDesc:"Dr. Artex EV Silver / EV Blue + EV VibroBarrier + Lace Expert — ultra-light materials, designed for electric vehicles",
+q_vibroBasicDesc:"Dr. Artex OEM VibroMax — entry-level anti-vibration",q_vibroProDesc:"Dr. Artex Earth Iridium — standard 2mm anti-vibration",q_vibroLuxuryDesc:"Dr. Artex Earth Gold HD — premium 2.6mm anti-vibration",q_vibroEvDesc:"Dr. Artex EV Silver — ultra-light EV anti-vibration",
+evGamLabel:"⚡ Range for electric vehicles — ultra-light materials",evDefault:"EV Blue + EV VibroBarrier — ultra-light",
+matIncluded:"Materials included",layerN:"Layer",priceNote:"📦 Estimated price for materials only · includes 10% surplus · labor calculated separately",
+doorCoverTitle:"Door coverage",justSpeaker:"Speaker area only",justSpeakerDesc:"~40% surface",fullSurface:"Full surface",fullSurfaceDesc:"100% door",
+partialTitle:"Front door coverage — Basic",fullDoorTitle:"Full surface",fullDoorDesc:"Complete door insulation — for comfort",speakerTitle:"Speaker area only",speakerDesc:"Anti-vibration around the speaker area — creates an acoustic enclosure for cleaner bass",backBtn:"← Back",
+whyImportant:"Why is this important?",step1Label:"Step 1",step1HintCopy:"Choose the number of layers on the left. After selection, materials and prices appear on the right.",trunkStep1HintCopy:"Choose the number of layers for this sub-zone. After selection, materials and estimate appear on the right.",
+trunkTitle:"Trunk",trunkSubQ:"Tap on a zone to configure it:",trunkDone:"✓ Done with trunk",trunkSelectTitle:"Select a sub-zone",trunkSelectHint:"The floor, sides and hatch have different constructions, so they are configured separately. After selection, materials and estimates appear on the right.",
+tsz_main_name:"Trunk floor + sides",tsz_main_icon:"🪵",tsz_main_desc:"The floor and side walls of the trunk — different materials for each surface",tsz_door_name:"Hatch / Rear door",tsz_door_icon:"🚪",tsz_door_desc:"Light materials recommended",tsz_door_note:"Light materials recommended to avoid overloading the struts.",
+sectionFloor:"🪵 Floor",sectionSides:"🧱 Sides (max 9-10mm)",
+cartTitle:"🛒 Your Cart",cartEmptyMsg:"Cart is empty",totalMatLabel:"Materials total:",totalMatShort:"Materials total",checkoutBtn:"Checkout →",continueBtn:"← Continue",zonesCfg1:"zone configured",zonesCfgN:"zones configured",
+summaryTitle:"Configuration summary",desktopEmptyZones:"Select zones →",inclAccess:"incl. accessories",viewCartBtn:"🛒 View cart",
+needMoreSheets:"Need a few extra sheets?",indivSheets:"+ Individual sheets",indivSheetsTitle:"Individual sheets",indivSheetsSub:"Add extra sheets of any material directly to cart.",totalSheetsLabel:"Total sheets:",addToCartBtn:"🛒 Add to cart",
+carChangedTitle:"⚠️ Car has changed",carChangedDefault:"Cart contains configurations for a different car.",addForNew:"➕ Add for new car (keep both)",resetCartBtn:"🗑️ Reset cart and configure again",cancelBtn:"✕ Cancel",
+vsTitle:"🚗 Changing configured car",keepForPrev:"📦 Keep cart for previous car",resetForNew:"🗑️ Empty cart and start fresh for new car",
+zrBadge:"Zone replacement",zrTitle:"This zone already exists in cart",zrCopy:"You already have this zone configured with different materials. Do you want to replace the existing version with the new selection?",keepFromCart:"Keep version from cart",replaceInCart:"Yes, replace in cart",currentCfgLabel:"Current configuration",newCfgLabel:"New configuration",
+zeBadge:"Zone configured",zeTitle:"Zone is already configured",zeCopy:"This zone already exists in cart. If you want to modify it, we delete the current configuration and you start from scratch.",keepCurrentBtn:"Keep current version",editFromZero:"Yes, modify from scratch",
+psBadge:"Flow change",stayOnZones:"Stay with configured zones",cfgZonesBadge:"Already configured zones",
+chkSummaryTitle:"🛒 Order summary",chkVerify:"Review materials before checkout",chkNeedInstall:"Do you need installation?",chkWithInstallTitle:"Yes, I want professional installation",chkWithInstallDesc:"We calculate the labor cost for your car",chkDiyTitle:"No, I'll install it myself",chkDiyDesc:"Access to the free video tutorial library",
+chkLaborTitle:"🔧 Estimated labor",chkLaborTotalEst:"Total estimated labor",chkLaborAfterDisc:"Total installation after discount",chkTotalMatLabor:"TOTAL (materials + installation)",chkLaborNote:"* Final labor price will be confirmed by the EdoTec team at scheduling.",
+diyTitle:"🔧 Installing it yourself?",diySub:"These products will be useful for a professional installation",diyBonus:"Bonus: you will receive by email access to a video library with instructions on how to apply sound insulation material.",diyAllPack:"Complete package — all 6 products",diySavings:"Save",diySavingsPost:"RON vs individual price",diyTotalSel:"Total tools selected:",diyAddBtn:"✅ Add tools and continue →",diySkipBtn:"Continue without tools →",
+citySelectTitle:"📍 Where do you want installation?",citySelectSub:"Select the city from the list of available installation centers",
+cfTitle:"📋 Your contact details",cfSub:"Required for the quote we send to our team",cfFirstName:"First name",cfLastName:"Last name",cfPhone:"📱 Phone",cfEmail:"Email",cfAddress:"📬 Address",cfCity:"City",cfCounty:"County",cfContinueBtn:"Continue → Payment method",
+errFirstLast:"Please enter your first and last name.",errPhone:"Invalid phone number (e.g.: 0740 123 456).",errEmail:"Invalid email.",errAddress:"Please enter your address.",errCity:"Please enter your city.",errCounty:"Please enter your county.",
+payTitle:"💳 Payment method",paySub:"Select how you want to pay — will be applied automatically at the next step",paySoon:"Coming soon",payErrMsg:"Please select a payment method.",
+delTitle:"📦 Where should we deliver?",delSub:"Choose the delivery location for the insulation materials",delSelectMsg:"Select a delivery method",finalizeOrderBtn:"✅ Place order →",
+thankYouTitle:"Thank you, {name}! 🎉",successMsg:"Your order has been successfully registered.",successMsg2:"A member of the EdoTec team will contact you <strong>as soon as possible</strong> to confirm the details and arrange delivery.",orderSumSmall:"📋 Order summary",emailConfirmSent:"✉️ Confirmation sent by email",closeSuccess:"✨ Close — see you soon!",
+discBarTitle:"🎯 Automatic material discounts",
+mcTitle:"How do you want to configure your insulation?",mcCopy:"You can go for detailed configuration, choose a pre-designed package, or calculate directly for the whole car. Choose the option that suits you.",mcManualTitle:"Configure by zones",mcManualCopy:"Click directly on the car and choose layers and materials separately for each surface.",mcManualSpan:"Maximum control",mcPkgTitle:"Popular packages",mcPkgCopy:"Get pre-made combinations, useful if you want to quickly choose one of the most requested options.",mcPkgSpan:"Fast and simple",mcFullTitle:"Full insulation",mcFullCopy:"Calculate the complete option for the chosen car in one click, without manual configuration for each zone.",mcFullSpan:"Whole car",
+toastSelectCar:"Please select your car first!",toastSelectEngine:"Please select brand, model and engine type first!",toastEmptyCart:"Cart is empty!",toastAddSheet:"Add at least one sheet!",toastSheetsAdded:"✓ Sheets added to cart!",toastSessionRestored:"✅ Your session has been restored!",toastPrevCleaned:"Previous selection was cleared. You can continue with the chosen package.",toastAdded:"added to cart!",toastAlreadyInCart:"Zone is already in cart with the same configuration.",
+fpTitle:"🚗 Complete Package",fpChooseQ:"Choose material quality",fpSelectFirst:"🛒 Select a quality first",fpAddCart:"🛒 Add to cart",fpLaborTitle:"Installation labor estimate",fpLaborDesc:"You can choose at the next step if you want professional installation",fpZonesDetail:"▾ Included zones ({n} zones, ~{a} m²)",fpEstNote:"* Estimate. Final price depends on car condition and chosen installer.",
+ppTitle:"🎯 Popular Packages",ppChoosePkg:"Choose the right combination for you",ppNote:"* Click on material to add directly to cart · includes 10% surplus · labor at next step",ppBack:"← Back",
+stratLabel:"Layer",noCarLabel:"Unspecified vehicle",laborBadge:"🔧 Estimated installation:",laborBadgePost:"· can be added at checkout",stratStr:"layer",straturiStr:"layers",
+doorsPartialSuffix:" (speaker area only)",roofNormalSuffix:" (sunroof)",roofPanoramicSuffix:" (panoramic sunroof)",portbagajPrefix:"Trunk — ",maxLayersN:"{n} layers",maxLayers1:"1 layer",listenWithSound:"Listen with sound",
+pkgMaterialsAdded:"(materials) added to cart!",pkgWithLaborAdded:"+ labor added to cart!",
+},
+hu:{
+pageTitle:"Autó Hangszigetelés Konfigurátor | EdoTec",headerSub:"Hangszigetelés Konfigurátor",cartBtnTxt:"Kosár",finalize:"Fizetés",
+step1Strong:"Jármű",step1Small:"válaszd ki az autódat és a motor típusát",step2Strong:"Zónák",step2Small:"pontosan jelöld meg mit szeretnél hangszigetelni",step3Strong:"Végső beállítások",step3Small:"közvetlenül a 2. lépésben választhatók",
+selectCar:"Válaszd ki a járművet",lbBrand:"Márka",lbModel:"Modell",lbYear:"Év",lbBodyType:"Karosszéria típus",phBrand:"— márka —",phModel:"— modell —",phYear:"— év —",continueZones:"Folytatás a zónaválasztáshoz →",zonesCfgTitle:"Konfigurált zónák",noZoneSel:"Nincs kiválasztott zóna",
+propCombustie:"Belső égésű",propElectric:"Elektromos / Hibrid",versionPromptTitle:"Kérjük, adja meg a verziót.",versionPromptCopy:"Válassza ki a megfelelő karosszéria változatot és a konfigurátor automatikusan folytatódik.",editCar:"✏️ Módosítás",
+heroTitle:'Számítsa ki autója hangszigetelésének költségét <span class="hero-title-accent">2 perc alatt</span>.',heroFast:"Gyors konfiguráció",heroPrice:"Azonnali ár",
+mapCtaTitle:"Kattintson arra a zónára, amelyet hangszigetelni szeretne",mapCtaSub:"Először válassza ki az autót és a motor típusát",
+mgTitle:"3 módon folytathatja",mgCopy:"Először válassza ki, hogyan szeretne konfigurálni: kézzel zónánként, egy népszerű csomagon keresztül, vagy az egész autóra.",mgManualTitle:"Zónánként",mgManualCopy:"Kattintson közvetlenül az autóra és válassza ki külön-külön az egyes felületeket.",mgManualHint:"Válassza ki az alábbi zónákat",mgPopTitle:"Népszerű csomagok",mgPopCopy:"Gyors kombinációk, a legkeresettebb forgatókönyvekhez tervezve.",mgPopMini:"Gyors lehetőség",mgFullTitle:"Teljes szigetelés",mgFullCopy:"Számítsa ki az egész autót egy kattintással.",mgFullMini:"Egész autó",
+mobileHint:"Válassza a \"Zónánként\" lehetőséget az autón lévő pontok aktiválásához.",popBtnTitle:"Népszerű Csomagok",popBtnSub:"Ajánlott kombinációk",fullBtnTitle:"Teljes Szigetelés",fullBtnSub:"Minden zóna, egy kattintás",
+z_capota:"Motorháztető",z_firewall:"Tűzfal (műszerfal)",z_doors_front:"Első ajtók",z_doors_rear:"Hátsó ajtók",z_floor:"Padló",z_trunk:"Csomagtartó",z_roof:"Tető",z_arch_front:"Első kerékdobok",z_arch_rear:"Hátsó kerékdobok",z_trunk_main:"Csomagtartó padló + oldalak",z_trunk_floor:"Csomagtartó padló",z_trunk_sides:"Csomagtartó oldalak",z_trunk_door:"Csomagtartó ajtó",
+pin_capota:"Motorháztető",pin_doors_front:"Első ajtók ×2",pin_doors_rear:"Hátsó ajtók ×2",pin_roof:"Tető",pin_floor:"Padló",pin_trunk:"Csomagtartó",pin_arch_front:"Első kerékdobok ×2",pin_arch_rear:"Hátsó kerékdobok ×2",pairSuffix:" (mindkettő, ×2)",
+l1Label:"1 Réteg",l1Desc:"Blokkolja a rezgéseket és lemezrezonanciákat",l2Label:"2 Réteg",l2Desc:"Rezgésgátló + hangszigetelés",l3Label:"3 Réteg",l3Desc:"Rezgésgátló + hangszigetelés + hőszigetelő gát",l4Label:"4 Réteg",l4Desc:"Teljes rendszer: rezgésgátló + hangvédő gát + hőszigetelő gát + hangelnyelő hab",
+tl1Desc:"Megszünteti a padló rezgéseit és fémzaját",tl2Desc:"Rezgésgátló + hangvédő gát — jelentősen csökkenti a hátsó zajt",tl3Desc:"Rezgésgátló + hangvédő gát + 2. rezgésgátló réteg — sokkal csendesebb csomagtartó",tl4Desc:"Maximális csomag: 2× rezgésgátló + hangvédő gát + Swell Foam hangelnyelő hab — teljes szigetelés",
+howManyLayers:"Hány szigetelési réteget szeretne ehhez",photoNote:"A termékfotók később kerülnek hozzáadásra",
+encAdd1:"Még egy réteg hozzáadásával",encAddN:"Még {n} réteg hozzáadásával",encText:"a munkadíj nagyon keveset növekszik — a különbség csak <strong>{pct}%</strong>. Amint az ajtó nyitva van, a további rétegek felszerelése nem vesz el sok időt. Később megbánhatja! 🎵",
+doorDisasmTitle:"Ellenőrzés szükséges az ügyfél átvételénél",doorDisasmNote:"a külső ajtólemezhez való hozzáférés megköveteli a belső burkolat eltávolítását. <strong>Ez befolyásolhatja a munkadíjat.</strong> Kollégáink ellenőrzik Önnek, mielőtt felhívják.",doorDisasmNoteModel:"azon modellek közé tartozik, amelyek szétszerelést igényelnek. ",
+roofQ:"Van tetőablaka? Válassza ki a típust a helyes felület kiszámításához.",noSunroof:"Nincs tetőablak",noSunroofDesc:"Teljes tetőfelület",noSunroofBadge:"100% felület",normalSunroof:"Normál tetőablak",normalSunroofDesc:"25% anyagfelület levonva",normalSunroofBadge:"-25% felület",panoramicSunroof:"Panoráma tetőablak",panoramicSunroofDesc:"50% anyagfelület levonva",panoramicSunroofBadge:"-50% felület",continueArrow:"Folytatás →",sunroofNormalLabel:"normál tetőablak (-25%)",sunroofPanoramicLabel:"panoráma tetőablak (-50%)",roofHintTitle:"Válassza ki a tetőablak típusát",roofHintCopy:"A tető hasznos felülete automatikusan újraszámítódik a tetőablak alapján.",
+q_basicDesc:"Dr. Artex VibroMax + Audio System Neoprene — belépő szint, kiváló ár/érték arány",q_proDesc:"Dr. Artex Earth Iridium + Baffle Integra — jó teljesítmény, magas ár/érték arány",q_luxuryDesc:"Dr. Artex Earth Gold HD + Baffle Zima + Swell Wave 35 — maximális teljesítmény",q_evDesc:"Dr. Artex EV Silver / EV Blue + EV VibroBarrier + Lace Expert — rendkívül könnyű anyagok elektromos járművekhez",
+q_vibroBasicDesc:"Dr. Artex OEM VibroMax — belépő szintű rezgésgátló",q_vibroProDesc:"Dr. Artex Earth Iridium — normál 2mm rezgésgátló",q_vibroLuxuryDesc:"Dr. Artex Earth Gold HD — prémium 2.6mm rezgésgátló",q_vibroEvDesc:"Dr. Artex EV Silver — ultra könnyű EV rezgésgátló",
+evGamLabel:"⚡ Elektromos járművekhez — ultra könnyű anyagok",evDefault:"EV Blue + EV VibroBarrier — ultra könnyű",
+matIncluded:"Felhasznált anyagok",layerN:"Réteg",priceNote:"📦 Becsült ár csak anyagokra · 10% felesleget tartalmaz · munkadíj külön számítva",
+doorCoverTitle:"Ajtóborítás",justSpeaker:"Csak hangszóró terület",justSpeakerDesc:"~40% felület",fullSurface:"Teljes felület",fullSurfaceDesc:"100% ajtó",
+partialTitle:"Első ajtó borítás — Basic",fullDoorTitle:"Teljes felület",fullDoorDesc:"Teljes ajtó szigetelés — kényelemért",speakerTitle:"Csak hangszóró terület",speakerDesc:"Rezgésgátló a hangszóró körüli területen — tisztább bassushoz",backBtn:"← Vissza",
+whyImportant:"Miért fontos ez?",step1Label:"1. lépés",step1HintCopy:"Válassza ki a rétegek számát balra. A kiválasztás után jobbra jelennek meg az anyagok és árak.",trunkStep1HintCopy:"Válassza ki a rétegek számát ehhez az alzónához.",
+trunkTitle:"Csomagtartó",trunkSubQ:"Koppintson egy zónára a konfigurálásához:",trunkDone:"✓ Kész a csomagtartóval",trunkSelectTitle:"Válasszon alzónát",trunkSelectHint:"A padló, az oldalak és a csomagtérajtó eltérő szerkezetű, ezért külön konfigurálják.",
+tsz_main_name:"Csomagtartó padló + oldalak",tsz_main_icon:"🪵",tsz_main_desc:"A csomagtartó padlója és oldalfalai — minden felülethez eltérő anyagok",tsz_door_name:"Csomagtérajtó / Hátsó ajtó",tsz_door_icon:"🚪",tsz_door_desc:"Könnyű anyagok ajánlottak",tsz_door_note:"Könnyű anyagok ajánlottak a lengéscsillapítók terhelésének elkerülése érdekében.",
+sectionFloor:"🪵 Padló",sectionSides:"🧱 Oldalak (max 9-10mm)",
+cartTitle:"🛒 A kosara",cartEmptyMsg:"A kosár üres",totalMatLabel:"Anyagok összesen:",totalMatShort:"Anyagok összesen",checkoutBtn:"Pénztár →",continueBtn:"← Folytatás",zonesCfg1:"konfigurált zóna",zonesCfgN:"konfigurált zóna",
+summaryTitle:"Konfiguráció összefoglalója",desktopEmptyZones:"Válasszon zónákat →",inclAccess:"kiegészítőkkel",viewCartBtn:"🛒 Kosár megtekintése",
+needMoreSheets:"Szüksége van néhány extra lapra?",indivSheets:"+ Egyéni lapok",indivSheetsTitle:"Egyéni lapok",indivSheetsSub:"Adjon hozzá extra lapokat bármilyen anyagból.",totalSheetsLabel:"Lapok összesen:",addToCartBtn:"🛒 Kosárba",
+carChangedTitle:"⚠️ Az autó megváltozott",carChangedDefault:"A kosár egy másik autó konfigurációit tartalmazza.",addForNew:"➕ Hozzáadás az új autóhoz (mindkettő megőrzése)",resetCartBtn:"🗑️ Kosár visszaállítása és újrakonfigurálás",cancelBtn:"✕ Mégse",
+vsTitle:"🚗 Konfigurált autó cseréje",keepForPrev:"📦 Kosár megőrzése az előző autóhoz",resetForNew:"🗑️ Kosár ürítése az új autóhoz",
+zrBadge:"Zónacsere",zrTitle:"Ez a zóna már szerepel a kosárban",zrCopy:"Ezt a zónát már más anyagokkal konfigurálta. Szeretné lecserélni?",keepFromCart:"Kosárban lévő verzió megtartása",replaceInCart:"Igen, csere a kosárban",currentCfgLabel:"Jelenlegi konfiguráció",newCfgLabel:"Új konfiguráció",
+zeBadge:"Konfigurált zóna",zeTitle:"A zóna már be van állítva",zeCopy:"Ez a zóna már szerepel a kosárban. Ha módosítani szeretné, töröljük az aktuális konfigurációt.",keepCurrentBtn:"Jelenlegi verzió megtartása",editFromZero:"Igen, nulláról módosítom",
+psBadge:"Folyamatváltás",stayOnZones:"Maradok a konfigurált zónákon",cfgZonesBadge:"Már konfigurált zónák",
+chkSummaryTitle:"🛒 Rendelés összefoglalója",chkVerify:"Ellenőrizze az anyagokat a fizetés előtt",chkNeedInstall:"Szüksége van szereléssel?",chkWithInstallTitle:"Igen, profi szerelést kérek",chkWithInstallDesc:"Kiszámítjuk autója munkadíját",chkDiyTitle:"Nem, magam szerelembe",chkDiyDesc:"Hozzáférés az ingyenes videós bemutató könyvtárhoz",
+chkLaborTitle:"🔧 Becsült munkadíj",chkLaborTotalEst:"Becsült munkadíj összesen",chkLaborAfterDisc:"Összesen szerelés után kedvezménnyel",chkTotalMatLabor:"ÖSSZESEN (anyagok + szerelés)",chkLaborNote:"* A végső munkadíj árat az EdoTec csapata erősíti meg.",
+diyTitle:"🔧 Maga végzi a szerelést?",diySub:"Ezek a termékek hasznosak lesznek a professzionális szereléshez",diyBonus:"Bónusz: e-mailben kap hozzáférést videós útmutatókhoz.",diyAllPack:"Teljes csomag — mind a 6 termék",diySavings:"Megtakarítás",diySavingsPost:"RON az egyedi árhoz képest",diyTotalSel:"Kiválasztott eszközök összesen:",diyAddBtn:"✅ Eszközök hozzáadása és folytatás →",diySkipBtn:"Folytatás eszközök nélkül →",
+citySelectTitle:"📍 Hol szeretné a szerelést?",citySelectSub:"Válassza ki a várost az elérhető szerelőközpontok listájából",
+cfTitle:"📋 Kapcsolattartási adatai",cfSub:"Szükséges a csapatunknak küldött ajánlathoz",cfFirstName:"Keresztnév",cfLastName:"Vezetéknév",cfPhone:"📱 Telefon",cfEmail:"Email",cfAddress:"📬 Cím",cfCity:"Város",cfCounty:"Megye",cfContinueBtn:"Folytatás → Fizetési mód",
+errFirstLast:"Kérjük, adja meg keresztnevét és vezetéknevét.",errPhone:"Érvénytelen telefonszám.",errEmail:"Érvénytelen email.",errAddress:"Kérjük, adja meg a címét.",errCity:"Kérjük, adja meg városát.",errCounty:"Kérjük, adja meg a megyéjét.",
+payTitle:"💳 Fizetési mód",paySub:"Válassza ki, hogyan szeretne fizetni",paySoon:"Hamarosan elérhető",payErrMsg:"Kérjük, válasszon fizetési módot.",
+delTitle:"📦 Hova szállítsuk a termékeket?",delSub:"Válassza ki a szállítási helyszínt",delSelectMsg:"Válasszon kézbesítési módot",finalizeOrderBtn:"✅ Rendelés leadása →",
+thankYouTitle:"Köszönjük, {name}! 🎉",successMsg:"Rendelése sikeresen regisztrálva lett.",successMsg2:"Az EdoTec csapat egyik tagja <strong>a lehető leghamarabb</strong> felveszi Önnel a kapcsolatot.",orderSumSmall:"📋 Rendelés összefoglalója",emailConfirmSent:"✉️ Visszaigazolás elküldve emailben",closeSuccess:"✨ Bezárás — hamarosan találkozunk!",
+discBarTitle:"🎯 Automatikus anyagkedvezmények",
+mcTitle:"Hogyan szeretné konfigurálni a hangszigetelést?",mcCopy:"Választhat részletes konfigurálást, előre megtervezett csomagot, vagy az egész autóra számíthat.",mcManualTitle:"Konfigurálás zónánként",mcManualCopy:"Kattintson közvetlenül az autóra és válassza ki külön az egyes felületek rétegeit és anyagait.",mcManualSpan:"Maximális kontroll",mcPkgTitle:"Népszerű csomagok",mcPkgCopy:"Előre elkészített kombinációkat kap a legkeresettebb lehetőségekből.",mcPkgSpan:"Gyors és egyszerű",mcFullTitle:"Teljes szigetelés",mcFullCopy:"Számítsa ki a teljes lehetőséget egy kattintással.",mcFullSpan:"Egész autó",
+toastSelectCar:"Kérjük, először válassza ki autóját!",toastSelectEngine:"Kérjük, először válassza ki a márkát, modellt és motor típusát!",toastEmptyCart:"A kosár üres!",toastAddSheet:"Adjon hozzá legalább egy lapot!",toastSheetsAdded:"✓ Lapok hozzáadva a kosárhoz!",toastSessionRestored:"✅ Munkamenete visszaállítva!",toastPrevCleaned:"Az előző kiválasztás törlésre került.",toastAdded:"kosárba helyezve!",toastAlreadyInCart:"A zóna már a kosárban van ugyanazzal a konfigurációval.",
+fpTitle:"🚗 Teljes csomag",fpChooseQ:"Válassza ki az anyagminőséget",fpSelectFirst:"🛒 Először válasszon minőséget",fpAddCart:"🛒 Kosárba",fpLaborTitle:"Szerelési munkadíj becslése",fpLaborDesc:"A következő lépésnél választhat profi szerelést",fpZonesDetail:"▾ Belefoglalt zónák ({n} zóna, ~{a} m²)",fpEstNote:"* Becslés. A végső ár az autó állapotától függ.",
+ppTitle:"🎯 Népszerű Csomagok",ppChoosePkg:"Válassza ki az Önnek megfelelő kombinációt",ppNote:"* Kattintson az anyagra a kosárba adáshoz · 10% felesleget tartalmaz · munkadíj következő lépésnél",ppBack:"← Vissza",
+stratLabel:"Réteg",noCarLabel:"Nem meghatározott jármű",laborBadge:"🔧 Becsült szerelés:",laborBadgePost:"· a fizetésnél adható hozzá",stratStr:"réteg",straturiStr:"réteg",
+doorsPartialSuffix:" (csak hangszóró terület)",roofNormalSuffix:" (tetőablak)",roofPanoramicSuffix:" (panoráma tetőablak)",portbagajPrefix:"Csomagtartó — ",maxLayersN:"{n} réteg",maxLayers1:"1 réteg",listenWithSound:"Hallgasson hanggal",
+pkgMaterialsAdded:"(anyagok) kosárba helyezve!",pkgWithLaborAdded:"+ munkadíj kosárba helyezve!",
+},
+bg:{
+pageTitle:"Конфигуратор Звукоизолация | EdoTec",headerSub:"Конфигуратор Звукоизолация",cartBtnTxt:"Количка",finalize:"Плащане",
+step1Strong:"Автомобил",step1Small:"изберете колата и типа на двигателя",step2Strong:"Зони",step2Small:"определете точно какво искате да изолирате",step3Strong:"Крайни опции",step3Small:"избират се директно в стъпка 2",
+selectCar:"Изберете автомобила",lbBrand:"Марка",lbModel:"Модел",lbYear:"Година",lbBodyType:"Тип каросерия",phBrand:"— марка —",phModel:"— модел —",phYear:"— година —",continueZones:"Продължете към избор на зони →",zonesCfgTitle:"Конфигурирани зони",noZoneSel:"Няма избрана зона",
+propCombustie:"Горивен двигател",propElectric:"Електрически / Хибрид",versionPromptTitle:"Моля, посочете версията.",versionPromptCopy:"Изберете правилния вариант на каросерията и конфигураторът ще продължи автоматично.",editCar:"✏️ Промени",
+heroTitle:'Изчислете разходите за звукоизолация на колата си за <span class="hero-title-accent">2 минути</span>.',heroFast:"Бърза конфигурация",heroPrice:"Незабавна цена",
+mapCtaTitle:"Натиснете върху зоната, която искате да изолирате",mapCtaSub:"Първо изберете кола и тип двигател",
+mgTitle:"Можете да продължите по 3 начина",mgCopy:"Първо изберете как искате да конфигурирате: ръчно по зони, чрез популярен пакет или за цялата кола.",mgManualTitle:"По зони",mgManualCopy:"Натиснете директно върху колата и изберете поотделно всяка повърхност.",mgManualHint:"Изберете зони по-долу",mgPopTitle:"Популярни пакети",mgPopCopy:"Бързи комбинации за най-търсените сценарии.",mgPopMini:"Бърз вариант",mgFullTitle:"Пълна изолация",mgFullCopy:"Изчислете цялата кола с едно кликване.",mgFullMini:"Цяла кола",
+mobileHint:"Изберете \"По зони\", за да активирате точките върху колата.",popBtnTitle:"Популярни Пакети",popBtnSub:"Препоръчани комбинации",fullBtnTitle:"Пълна Изолация",fullBtnSub:"Всички зони, едно кликване",
+z_capota:"Преден капак",z_firewall:"Огнена стена (таблото)",z_doors_front:"Предни врати",z_doors_rear:"Задни врати",z_floor:"Под",z_trunk:"Багажник",z_roof:"Покрив",z_arch_front:"Предни калници",z_arch_rear:"Задни калници",z_trunk_main:"Под + страни на багажника",z_trunk_floor:"Под на багажника",z_trunk_sides:"Страни на багажника",z_trunk_door:"Врата на багажника",
+pin_capota:"Преден капак",pin_doors_front:"Предни врати ×2",pin_doors_rear:"Задни врати ×2",pin_roof:"Покрив",pin_floor:"Под",pin_trunk:"Багажник",pin_arch_front:"Предни калници ×2",pin_arch_rear:"Задни калници ×2",pairSuffix:" (и двете, ×2)",
+l1Label:"1 Слой",l1Desc:"Блокира вибрациите и резонансите на ламарината",l2Label:"2 Слоя",l2Desc:"Антивибрация + звукоизолация",l3Label:"3 Слоя",l3Desc:"Антивибрация + звукоизолация + топлинна бариера",l4Label:"4 Слоя",l4Desc:"Пълна система: антивибрация + звукова бариера + топлинна бариера + абсорбираща пяна",
+tl1Desc:"Елиминира вибрациите и металния шум на пода",tl2Desc:"Антивибрация + звукова бариера — значително намалява задния шум",tl3Desc:"Антивибрация + звукова бариера + 2-ри антивибрационен слой — по-тих багажник",tl4Desc:"Максимален пакет: 2× антивибрация + звукова бариера + Swell Foam — пълна изолация",
+howManyLayers:"Колко изолационни слоя искате за",photoNote:"Снимките на продуктите ще бъдат добавени по-късно",
+encAdd1:"Добавяйки още един слой",encAddN:"Добавяйки още {n} слоя",encText:"трудът се увеличава много малко — разликата е само <strong>{pct}%</strong>. Може по-късно да съжалявате! 🎵",
+doorDisasmTitle:"Необходима е проверка при получаване от клиента",doorDisasmNote:"достъпът до外ния панел на вратата изисква премахване на вътрешния панел. <strong>Това може да повлияе на разходите за труд.</strong> Нашите колеги ще проверят за вас.",doorDisasmNoteModel:"е от моделите, изискващи демонтаж. ",
+roofQ:"Има ли люк на покрива ви? Изберете типа за изчисляване на правилната повърхност.",noSunroof:"Без люк",noSunroofDesc:"Пълна повърхност на покрива",noSunroofBadge:"100% повърхност",normalSunroof:"Нормален люк",normalSunroofDesc:"Приспадат се 25% от повърхността",normalSunroofBadge:"-25% повърхност",panoramicSunroof:"Панорамен люк",panoramicSunroofDesc:"Приспадат се 50% от повърхността",panoramicSunroofBadge:"-50% повърхност",continueArrow:"Продължи →",sunroofNormalLabel:"нормален люк (-25%)",sunroofPanoramicLabel:"панорамен люк (-50%)",roofHintTitle:"Изберете типа люк",roofHintCopy:"Полезната повърхност на покрива се преизчислява автоматично въз основа на люка.",
+q_basicDesc:"Dr. Artex VibroMax + Audio System Neoprene — начално ниво, отлично съотношение качество/цена",q_proDesc:"Dr. Artex Earth Iridium + Baffle Integra — добра производителност",q_luxuryDesc:"Dr. Artex Earth Gold HD + Baffle Zima + Swell Wave 35 — максимална производителност",q_evDesc:"Dr. Artex EV Silver / EV Blue + EV VibroBarrier + Lace Expert — ултра леки материали за електрически автомобили",
+q_vibroBasicDesc:"Dr. Artex OEM VibroMax — начално ниво антивибрация",q_vibroProDesc:"Dr. Artex Earth Iridium — стандартна 2mm антивибрация",q_vibroLuxuryDesc:"Dr. Artex Earth Gold HD — премиум 2.6mm антивибрация",q_vibroEvDesc:"Dr. Artex EV Silver — ултра лека EV антивибрация",
+evGamLabel:"⚡ Гама за електрически превозни средства — ултра леки материали",evDefault:"EV Blue + EV VibroBarrier — ултра леки",
+matIncluded:"Включени материали",layerN:"Слой",priceNote:"📦 Прогнозна цена само за материали · включва 10% излишък · трудът се изчислява отделно",
+doorCoverTitle:"Покритие на вратата",justSpeaker:"Само зона за говорител",justSpeakerDesc:"~40% повърхност",fullSurface:"Пълна повърхност",fullSurfaceDesc:"100% врата",
+partialTitle:"Покритие на предните врати — Basic",fullDoorTitle:"Пълна повърхност",fullDoorDesc:"Пълна изолация на вратата — за комфорт",speakerTitle:"Само зона за говорител",speakerDesc:"Антивибрация около зоната на говорителя — по-чист бас",backBtn:"← Назад",
+whyImportant:"Защо е важно?",step1Label:"Стъпка 1",step1HintCopy:"Изберете броя слоеве вляво. След избора, вдясно се появяват материалите и цените.",trunkStep1HintCopy:"Изберете броя слоеве за тази подзона.",
+trunkTitle:"Багажник",trunkSubQ:"Натиснете върху зона за конфигуриране:",trunkDone:"✓ Готово с багажника",trunkSelectTitle:"Изберете подзона",trunkSelectHint:"Подът, страните и вратата имат различна конструкция, поради което се конфигурират отделно.",
+tsz_main_name:"Под + страни на багажника",tsz_main_icon:"🪵",tsz_main_desc:"Подът и страничните стени на багажника — различни материали за всяка повърхност",tsz_door_name:"Врата на багажника / Задна врата",tsz_door_icon:"🚪",tsz_door_desc:"Препоръчват се леки материали",tsz_door_note:"Препоръчват се леки материали, за да не се претоварват амортисьорите.",
+sectionFloor:"🪵 Под",sectionSides:"🧱 Страни (макс 9-10mm)",
+cartTitle:"🛒 Вашата количка",cartEmptyMsg:"Количката е празна",totalMatLabel:"Общо материали:",totalMatShort:"Общо материали",checkoutBtn:"Плащане →",continueBtn:"← Продължи",zonesCfg1:"конфигурирана зона",zonesCfgN:"конфигурирани зони",
+summaryTitle:"Резюме на конфигурацията",desktopEmptyZones:"Изберете зони →",inclAccess:"вкл. аксесоари",viewCartBtn:"🛒 Вижте количката",
+needMoreSheets:"Нуждаете се от още листове?",indivSheets:"+ Отделни листове",indivSheetsTitle:"Отделни листове",indivSheetsSub:"Добавете допълнителни листове директно в количката.",totalSheetsLabel:"Общо листове:",addToCartBtn:"🛒 Добави в количката",
+carChangedTitle:"⚠️ Автомобилът се е променил",carChangedDefault:"Количката съдържа конфигурации за друга кола.",addForNew:"➕ Добави за новата кола (запази и двете)",resetCartBtn:"🗑️ Нулирай количката и конфигурирай отново",cancelBtn:"✕ Отказ",
+vsTitle:"🚗 Смяна на конфигурирания автомобил",keepForPrev:"📦 Запази количката за предишната кола",resetForNew:"🗑️ Изпразни количката за новата кола",
+zrBadge:"Замяна на зона",zrTitle:"Тази зона вече е в количката",zrCopy:"Вече сте конфигурирали тази зона с различни материали. Искате ли да замените?",keepFromCart:"Запази версията от количката",replaceInCart:"Да, замени в количката",currentCfgLabel:"Текуща конфигурация",newCfgLabel:"Нова конфигурация",
+zeBadge:"Конфигурирана зона",zeTitle:"Зоната вече е конфигурирана",zeCopy:"Тази зона вече е в количката. Ако искате да я промените, изтриваме текущата конфигурация.",keepCurrentBtn:"Запази текущата версия",editFromZero:"Да, промени от нулата",
+psBadge:"Смяна на режим",stayOnZones:"Остани на конфигурираните зони",cfgZonesBadge:"Вече конфигурирани зони",
+chkSummaryTitle:"🛒 Резюме на поръчката",chkVerify:"Прегледайте материалите преди плащане",chkNeedInstall:"Нуждаете ли се от монтаж?",chkWithInstallTitle:"Да, искам професионален монтаж",chkWithInstallDesc:"Изчисляваме разходите за труд за вашата кола",chkDiyTitle:"Не, ще го монтирам сам",chkDiyDesc:"Достъп до безплатна видео библиотека с уроци",
+chkLaborTitle:"🔧 Прогнозен труд",chkLaborTotalEst:"Общо прогнозен труд",chkLaborAfterDisc:"Общо монтаж след отстъпка",chkTotalMatLabor:"ОБЩО (материали + монтаж)",chkLaborNote:"* Крайната цена на труда ще бъде потвърдена от екипа на EdoTec.",
+diyTitle:"🔧 Монтирате сами?",diySub:"Тези продукти ще ви бъдат полезни за професионален монтаж",diyBonus:"Бонус: ще получите достъп до видео библиотека с инструкции.",diyAllPack:"Пълен комплект — всички 6 продукта",diySavings:"Спестявате",diySavingsPost:"RON спрямо индивидуална цена",diyTotalSel:"Общо избрани инструменти:",diyAddBtn:"✅ Добави инструменти и продължи →",diySkipBtn:"Продължи без инструменти →",
+citySelectTitle:"📍 Къде искате монтаж?",citySelectSub:"Изберете града от списъка с налични центрове за монтаж",
+cfTitle:"📋 Вашите данни за контакт",cfSub:"Необходими за офертата, която изпращаме на нашия екип",cfFirstName:"Собствено име",cfLastName:"Фамилно име",cfPhone:"📱 Телефон",cfEmail:"Имейл",cfAddress:"📬 Адрес",cfCity:"Град",cfCounty:"Област",cfContinueBtn:"Продължи → Метод на плащане",
+errFirstLast:"Моля, въведете вашето собствено и фамилно име.",errPhone:"Невалиден телефонен номер.",errEmail:"Невалиден имейл.",errAddress:"Моля, въведете вашия адрес.",errCity:"Моля, въведете вашия град.",errCounty:"Моля, въведете вашата област.",
+payTitle:"💳 Метод на плащане",paySub:"Изберете как искате да платите",paySoon:"Очаквайте скоро",payErrMsg:"Моля, изберете метод на плащане.",
+delTitle:"📦 Къде да доставим продуктите?",delSub:"Изберете местоположението за доставка",delSelectMsg:"Изберете метод на доставка",finalizeOrderBtn:"✅ Направете поръчка →",
+thankYouTitle:"Благодарим, {name}! 🎉",successMsg:"Вашата поръчка беше успешно регистрирана.",successMsg2:"Член на екипа на EdoTec ще се свърже с вас <strong>възможно най-скоро</strong>.",orderSumSmall:"📋 Резюме на поръчката",emailConfirmSent:"✉️ Потвърждение изпратено по имейл",closeSuccess:"✨ Затвори — ще се видим скоро!",
+discBarTitle:"🎯 Автоматични отстъпки за материали",
+mcTitle:"Как искате да конфигурирате звукоизолацията?",mcCopy:"Можете да изберете детайлна конфигурация, предварително проектиран пакет или за цялата кола.",mcManualTitle:"Конфигуриране по зони",mcManualCopy:"Натиснете директно върху колата и изберете отделно слоевете и материалите.",mcManualSpan:"Максимален контрол",mcPkgTitle:"Популярни пакети",mcPkgCopy:"Получавате предварително подготвени комбинации.",mcPkgSpan:"Бързо и просто",mcFullTitle:"Пълна изолация",mcFullCopy:"Изчислете пълния вариант с едно кликване.",mcFullSpan:"Цяла кола",
+toastSelectCar:"Моля, първо изберете вашата кола!",toastSelectEngine:"Моля, първо изберете марка, модел и тип двигател!",toastEmptyCart:"Количката е празна!",toastAddSheet:"Добавете поне един лист!",toastSheetsAdded:"✓ Листовете са добавени в количката!",toastSessionRestored:"✅ Вашата сесия е възстановена!",toastPrevCleaned:"Предишният избор беше изчистен.",toastAdded:"добавено в количката!",toastAlreadyInCart:"Зоната вече е в количката със същата конфигурация.",
+fpTitle:"🚗 Пълен Пакет",fpChooseQ:"Изберете качество на материалите",fpSelectFirst:"🛒 Първо изберете качество",fpAddCart:"🛒 Добави в количката",fpLaborTitle:"Прогнозен труд за монтаж",fpLaborDesc:"Можете да изберете на следващата стъпка",fpZonesDetail:"▾ Включени зони ({n} зони, ~{a} m²)",fpEstNote:"* Прогноза. Крайната цена зависи от автомобила.",
+ppTitle:"🎯 Популярни Пакети",ppChoosePkg:"Изберете правилната комбинация за вас",ppNote:"* Кликнете върху материала за добавяне · включва 10% излишък · трудът на следващата стъпка",ppBack:"← Назад",
+stratLabel:"Слой",noCarLabel:"Неуточнено превозно средство",laborBadge:"🔧 Прогнозен монтаж:",laborBadgePost:"· може да се добави при плащане",stratStr:"слой",straturiStr:"слоя",
+doorsPartialSuffix:" (само зона за говорител)",roofNormalSuffix:" (люк)",roofPanoramicSuffix:" (панорамен люк)",portbagajPrefix:"Багажник — ",maxLayersN:"{n} слоя",maxLayers1:"1 слой",listenWithSound:"Слушайте със звук",
+pkgMaterialsAdded:"(материали) добавено в количката!",pkgWithLaborAdded:"+ труд добавено в количката!",
+}
+};
+
+function detectLang(){
+  try{const saved=localStorage.getItem('edotecLang');if(saved&&LANG[saved])return saved;}catch(e){}
+  const lang=(navigator.language||navigator.userLanguage||'en').toLowerCase();
+  if(lang.startsWith('ro'))return 'ro';
+  if(lang.startsWith('hu'))return 'hu';
+  if(lang.startsWith('bg'))return 'bg';
+  return 'en';
+}
+let currentLang=detectLang();
+function t(key){return(LANG[currentLang]&&LANG[currentLang][key])||LANG['en'][key]||key;}
+function setLang(lang){
+  currentLang=lang;
+  try{localStorage.setItem('edotecLang',lang);}catch(e){}
+  location.reload();
+}
+
+function applyStaticTranslations(){
+  document.title=t('pageTitle');
+  const hdrSub=document.querySelector('.logo-sub-line');if(hdrSub)hdrSub.textContent=t('headerSub');
+  const ls=document.getElementById('lang-select');if(ls)ls.value=currentLang;
+  // Cart button
+  const cartBtnEl=document.querySelector('.cart-btn');
+  if(cartBtnEl){
+    const svgEl=cartBtnEl.querySelector('svg');const nEl=document.getElementById('cart-n');
+    cartBtnEl.textContent='';
+    if(svgEl)cartBtnEl.appendChild(svgEl);
+    cartBtnEl.appendChild(document.createTextNode(t('cartBtnTxt')+' '));
+    const nSpan=nEl||document.createElement('span');
+    nSpan.className='cart-n';nSpan.id='cart-n';nSpan.textContent=nEl?nEl.textContent:'0';
+    cartBtnEl.appendChild(nSpan);
+  }
+  // Desktop steps
+  const ds1=document.getElementById('desktop-step-1');if(ds1){const st=ds1.querySelector('strong');const sm=ds1.querySelector('small');if(st)st.textContent=t('step1Strong');if(sm)sm.textContent=t('step1Small');}
+  const ds2=document.getElementById('desktop-step-2');if(ds2){const st=ds2.querySelector('strong');const sm=ds2.querySelector('small');if(st)st.textContent=t('step2Strong');if(sm)sm.textContent=t('step2Small');}
+  const ds3=document.getElementById('desktop-step-3');if(ds3){const st=ds3.querySelector('strong');const sm=ds3.querySelector('small');if(st)st.textContent=t('step3Strong');if(sm)sm.textContent=t('step3Small');}
+  // Car form
+  const cfTitleEl=document.querySelector('#car-form-expanded .block-title');if(cfTitleEl)cfTitleEl.textContent=t('selectCar');
+  const fls=document.querySelectorAll('#car-form-expanded .fl');
+  if(fls[0])fls[0].textContent=t('lbBrand');if(fls[1])fls[1].textContent=t('lbModel');if(fls[2])fls[2].textContent=t('lbYear');
+  const bodyLbl=document.querySelector('#body-type-row .fl');if(bodyLbl)bodyLbl.textContent=t('lbBodyType');
+  const sb=document.getElementById('sel-brand');if(sb&&sb.options[0])sb.options[0].textContent=t('phBrand');
+  const sm=document.getElementById('sel-model');if(sm&&sm.options[0])sm.options[0].textContent=t('phModel');
+  const sy=document.getElementById('sel-year');if(sy&&sy.options[0])sy.options[0].textContent=t('phYear');
+  const s1btn=document.getElementById('step1-continue-btn');if(s1btn)s1btn.textContent=t('continueZones');
+  const zbTitle=document.querySelector('#zones-block .block-title');if(zbTitle)zbTitle.textContent=t('zonesCfgTitle');
+  // Right col
+  const rightSumTitleEl=document.querySelector('.right-col .block-title');if(rightSumTitleEl)rightSumTitleEl.textContent=t('summaryTitle');
+  // Hero text
+  const heroTitleEl=document.querySelector('.hero-title');if(heroTitleEl)heroTitleEl.innerHTML=t('heroTitle');
+  // Map CTA
+  const mcTitleEl=document.querySelector('.map-cta-title');if(mcTitleEl)mcTitleEl.textContent=t('mapCtaTitle');
+  const mcSubEl=document.querySelector('.map-cta-sub');if(mcSubEl)mcSubEl.textContent=t('mapCtaSub');
+  // Mobile manual hint
+  const mmh=document.getElementById('mobile-manual-hint');if(mmh)mmh.textContent=t('mobileHint');
+  // Mode guide title/copy
+  const mgTitleEl=document.querySelector('.mode-guide-title');if(mgTitleEl)mgTitleEl.textContent=t('mgTitle');
+  const mgCopyEl=document.querySelector('.mode-guide-copy');if(mgCopyEl)mgCopyEl.textContent=t('mgCopy');
+  // Mode guide cards
+  const mgManual=document.getElementById('mode-guide-manual');
+  if(mgManual){const tit=mgManual.querySelector('.mode-guide-card-title');if(tit)tit.textContent=t('mgManualTitle');const cp=mgManual.querySelector('.mode-guide-card-copy');if(cp)cp.textContent=t('mgManualCopy');const hint=mgManual.querySelector('.mode-guide-arrow-hint span:last-child');if(hint)hint.textContent=t('mgManualHint');}
+  const mgPop=document.getElementById('mode-guide-popular');
+  if(mgPop){const tit=mgPop.querySelector('.mode-guide-card-title');if(tit)tit.textContent=t('mgPopTitle');const cp=mgPop.querySelector('.mode-guide-card-copy');if(cp)cp.textContent=t('mgPopCopy');const mini=mgPop.querySelector('.mode-guide-mini');if(mini)mini.textContent=t('mgPopMini');}
+  const mgFull=document.getElementById('mode-guide-full');
+  if(mgFull){const tit=mgFull.querySelector('.mode-guide-card-title');if(tit)tit.textContent=t('mgFullTitle');const cp=mgFull.querySelector('.mode-guide-card-copy');if(cp)cp.textContent=t('mgFullCopy');const mini=mgFull.querySelector('.mode-guide-mini');if(mini)mini.textContent=t('mgFullMini');}
+  // Zone pins
+  const pinMap={'capota':'pin_capota','doors_front':'pin_doors_front','doors_rear':'pin_doors_rear','roof':'pin_roof','floor':'pin_floor','trunk':'pin_trunk','arch_front':'pin_arch_front','arch_rear':'pin_arch_rear'};
+  Object.entries(pinMap).forEach(([zone,key])=>{const lbl=document.querySelector(`#zpin-${zone} .zpin-label`);if(lbl)lbl.textContent=t(key);});
+  // Cart modal
+  const cmTitleEl=document.querySelector('.cm-title');if(cmTitleEl)cmTitleEl.textContent=t('cartTitle');
+  const cmTotalLbl=document.querySelector('.cm-total-lbl');if(cmTotalLbl)cmTotalLbl.textContent=t('totalMatLabel');
+  // Cart modal buttons
+  const cmFooterBtns=document.querySelectorAll('.cm-footer .btn-cm-close');
+  if(cmFooterBtns[0])cmFooterBtns[0].textContent=t('continueBtn');
+  if(cmFooterBtns[1])cmFooterBtns[1].textContent=t('checkoutBtn');
+  // Mobile offer buttons
+  const popBtnM=document.getElementById('btn-popular-pkg-mobile');
+  if(popBtnM){const tit=popBtnM.querySelector('.pkg-btn-title');if(tit)tit.textContent=t('popBtnTitle');const sub=popBtnM.querySelector('.pkg-btn-sub');if(sub)sub.textContent=t('popBtnSub');}
+  const fullBtnM=document.getElementById('btn-full-pkg-mobile');
+  if(fullBtnM){const tit=fullBtnM.querySelector('.pkg-btn-title');if(tit)tit.textContent=t('fullBtnTitle');const sub=fullBtnM.querySelector('.pkg-btn-sub');if(sub)sub.textContent=t('fullBtnSub');}
+  // Extra sheets strip
+  const extraNote=document.querySelector('#extra-strip span');if(extraNote)extraNote.textContent=t('needMoreSheets');
+  const extraBtn=document.querySelector('#extra-strip button');if(extraBtn)extraBtn.textContent=t('indivSheets');
+  // Pro modal
+  const proTitle=document.querySelector('#pro-modal-bg .zm-zone-name');if(proTitle)proTitle.textContent=t('indivSheetsTitle');
+  const proSub=document.querySelector('#pro-modal-bg .zm-subtitle');if(proSub)proSub.textContent=t('indivSheetsSub');
+  // Mode choice modal
+  const mcModalTitle=document.querySelector('.mode-choice-title');if(mcModalTitle)mcModalTitle.textContent=t('mcTitle');
+  const mcModalCopy=document.querySelector('.mode-choice-copy');if(mcModalCopy)mcModalCopy.textContent=t('mcCopy');
+  const mcCards=document.querySelectorAll('.mode-choice-card');
+  if(mcCards[0]){const s=mcCards[0].querySelector('strong');if(s)s.textContent=t('mcManualTitle');const p=mcCards[0].querySelector('p');if(p)p.textContent=t('mcManualCopy');const sp=mcCards[0].querySelector('span');if(sp)sp.textContent=t('mcManualSpan');}
+  if(mcCards[1]){const s=mcCards[1].querySelector('strong');if(s)s.textContent=t('mcPkgTitle');const p=mcCards[1].querySelector('p');if(p)p.textContent=t('mcPkgCopy');const sp=mcCards[1].querySelector('span');if(sp)sp.textContent=t('mcPkgSpan');}
+  if(mcCards[2]){const s=mcCards[2].querySelector('strong');if(s)s.textContent=t('mcFullTitle');const p=mcCards[2].querySelector('p');if(p)p.textContent=t('mcFullCopy');const sp=mcCards[2].querySelector('span');if(sp)sp.textContent=t('mcFullSpan');}
+  // Zone replace dialog
+  const zrBadgeEl=document.querySelector('#zone-replace-bg .package-switch-badge');if(zrBadgeEl)zrBadgeEl.textContent=t('zrBadge');
+  const zrCopyEl=document.querySelector('#zone-replace-bg .package-switch-copy');if(zrCopyEl)zrCopyEl.textContent=t('zrCopy');
+  const zrLabels=document.querySelectorAll('#zone-replace-bg .zone-replace-label');
+  if(zrLabels[0])zrLabels[0].textContent=t('currentCfgLabel');if(zrLabels[1])zrLabels[1].textContent=t('newCfgLabel');
+  const zrBtnsEl=document.querySelectorAll('#zone-replace-bg .package-switch-btn');
+  if(zrBtnsEl[0])zrBtnsEl[0].textContent=t('keepFromCart');if(zrBtnsEl[1])zrBtnsEl[1].textContent=t('replaceInCart');
+  // Zone edit dialog
+  const zeBadgeEl=document.querySelector('#zone-edit-bg .package-switch-badge');if(zeBadgeEl)zeBadgeEl.textContent=t('zeBadge');
+  const zeCopyEl=document.querySelector('#zone-edit-bg .package-switch-copy');if(zeCopyEl)zeCopyEl.textContent=t('zeCopy');
+  const zeBtnsEl=document.querySelectorAll('#zone-edit-bg .package-switch-btn');
+  if(zeBtnsEl[0])zeBtnsEl[0].textContent=t('keepCurrentBtn');if(zeBtnsEl[1])zeBtnsEl[1].textContent=t('editFromZero');
+  // Package switch dialog
+  const psBadgeEl=document.querySelector('#package-switch-bg .package-switch-badge');if(psBadgeEl)psBadgeEl.textContent=t('psBadge');
+  const cfgZonesTitle=document.querySelector('.package-switch-zones-title');if(cfgZonesTitle)cfgZonesTitle.textContent=t('cfgZonesBadge');
+  const psBtnStay=document.querySelector('.package-switch-btn-stay');if(psBtnStay)psBtnStay.textContent=t('stayOnZones');
+  // version prompt
+  const vpTitle=document.querySelector('.version-prompt-title');if(vpTitle)vpTitle.textContent=t('versionPromptTitle');
+  const vpCopy=document.querySelector('.version-prompt-copy');if(vpCopy)vpCopy.textContent=t('versionPromptCopy');
+  // Car change modal
+  const ccTitle=document.querySelector('#car-change-bg .ccm-title');if(ccTitle)ccTitle.textContent=t('carChangedTitle');
+  const ccBtns=document.querySelectorAll('#car-change-bg .ccm-btn');
+  if(ccBtns[0])ccBtns[0].childNodes.forEach(n=>{if(n.nodeType===3&&n.textContent.trim())n.textContent=' '+t('addForNew');});
+  if(ccBtns[1])ccBtns[1].childNodes.forEach(n=>{if(n.nodeType===3&&n.textContent.trim())n.textContent=' '+t('resetCartBtn');});
+  if(ccBtns[2])ccBtns[2].childNodes.forEach(n=>{if(n.nodeType===3&&n.textContent.trim())n.textContent=' '+t('cancelBtn');});
+  // Vehicle switch
+  const vsTitleEl=document.querySelector('#vehicle-switch-bg .ccm-title');if(vsTitleEl)vsTitleEl.textContent=t('vsTitle');
+  // Cart strip finalize button
+  const csBtnEl=document.querySelector('.cart-strip .btn-checkout');if(csBtnEl)csBtnEl.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" style="vertical-align:middle;margin-right:5px"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'+t('finalize');
+  // Desktop right col total
+  const dtTotalLabel=document.querySelector('#desktop-total [style*="Total materiale"], #desktop-total .cs-label');
+  if(dtTotalLabel)dtTotalLabel.textContent=t('totalMatShort');
+  // View cart button
+  const vcBtn=document.querySelector('#desktop-total .btn-checkout');if(vcBtn)vcBtn.textContent=t('viewCartBtn');
+}
+
 // ════════════ EUR → RON (curs fix) ════════════
 let EUR_TO_RON = 5.10;
 const WHATSAPP_PHONE='';   // ex: '40740123456' (fara +)
@@ -1657,7 +2009,7 @@ function renderDiscountBar(){
     return `<div class="disc-bar-marker" style="left:${pos}%;background:${bg}">${lbl}</div>`;
   }).join('');
   return `<div class="disc-bar-wrap">
-    <div class="disc-bar-title">🎯 Reduceri automate materiale</div>
+    <div class="disc-bar-title" id="disc-bar-title">🎯 Reduceri automate materiale</div>
     <div class="disc-bar-track">
       <div class="disc-bar-fill" style="width:${fillPct}%"></div>
       ${markers}
@@ -1999,13 +2351,14 @@ const surfaces={
   arch_rear:  [1.15, 1.28, 1.92, 1.60, 1.92, 1.92, 1.92, 2.20]
 };
 
-const zoneNames={
-  capota:"Capotă",firewall:"Firewall (tablier)",doors_front:"Uși față",
-  doors_rear:"Uși spate",floor:"Podea",trunk:"Portbagaj",
-  roof:"Plafon",arch_front:"Carenaj față",arch_rear:"Carenaj spate",
-  trunk_main:"Podea + laterale portbagaj",trunk_floor:"Podea portbagaj",
-  trunk_sides:"Laterale portbagaj",trunk_door:"Ușă portbagaj"
-};
+function getZoneNames(){return{
+  capota:t('z_capota'),firewall:t('z_firewall'),doors_front:t('z_doors_front'),
+  doors_rear:t('z_doors_rear'),floor:t('z_floor'),trunk:t('z_trunk'),
+  roof:t('z_roof'),arch_front:t('z_arch_front'),arch_rear:t('z_arch_rear'),
+  trunk_main:t('z_trunk_main'),trunk_floor:t('z_trunk_floor'),
+  trunk_sides:t('z_trunk_sides'),trunk_door:t('z_trunk_door')
+};}
+const zoneNames=getZoneNames();
 
 // ════════════ ZONE DETAILS — descriere + video per zonă ════════════
 // videoUrl: link YouTube (watch/share/embed) sau link direct .mp4
@@ -2112,7 +2465,7 @@ function buildDesktopZoneSideHtml(zoneKey, options={}){
   if(details&&details.videoUrl) html+=renderZoneVideoHtml(details.videoUrl);
   if(details&&details.desc){
     html+=`<div class="zm-side-intro">
-      <div class="zm-side-intro-title">${opts.introTitle||'De ce e important?'}</div>
+      <div class="zm-side-intro-title">${opts.introTitle||t('whyImportant')}</div>
       <div class="zm-side-intro-copy">${details.desc}</div>
     </div>`;
   }
@@ -2166,31 +2519,33 @@ const prods={
 };
 
 // Layer descriptions — generale
-const layerInfo=[
-  {n:1,label:"1 Strat",desc:"Blochează vibrațiile și rezonanțele tablei",ph:"layer-ph-1"},
-  {n:2,label:"2 Straturi",desc:"Antivibrație + izolare fonică",ph:"layer-ph-2"},
-  {n:3,label:"3 Straturi",desc:"Antivibrații + izolare fonică + barieră termică",ph:"layer-ph-3"},
-  {n:4,label:"4 Straturi",desc:"Sistem complet: antivibrație + barieră fonică + barieră termică + spumă fonoabsorbantă",ph:"layer-ph-4"}
-];
+function getLayerInfo(){return[
+  {n:1,label:t('l1Label'),desc:t('l1Desc'),ph:"layer-ph-1"},
+  {n:2,label:t('l2Label'),desc:t('l2Desc'),ph:"layer-ph-2"},
+  {n:3,label:t('l3Label'),desc:t('l3Desc'),ph:"layer-ph-3"},
+  {n:4,label:t('l4Label'),desc:t('l4Desc'),ph:"layer-ph-4"}
+];}
+const layerInfo=getLayerInfo();
 
 // Layer descriptions specifice pentru portbagaj (podea)
-const layerInfoTrunk=[
-  {n:1,label:"1 Strat",desc:"Elimină vibrațiile și zgomotul metalic al podelei",ph:"layer-ph-1"},
-  {n:2,label:"2 Straturi",desc:"Antivibrație + barieră fonică — reduce semnificativ zgomotul din spate",ph:"layer-ph-2"},
-  {n:3,label:"3 Straturi",desc:"Antivibrație + barieră fonică + al 2-lea strat anti-vibrații — portbagaj mult mai liniștit",ph:"layer-ph-3"},
-  {n:4,label:"4 Straturi",desc:"Pachet maxim: 2× antivibrație + barieră fonică + spumă fonoabsorbantă Swell Foam — izolare completă",ph:"layer-ph-4"}
-];
+function getLayerInfoTrunk(){return[
+  {n:1,label:t('l1Label'),desc:t('tl1Desc'),ph:"layer-ph-1"},
+  {n:2,label:t('l2Label'),desc:t('tl2Desc'),ph:"layer-ph-2"},
+  {n:3,label:t('l3Label'),desc:t('tl3Desc'),ph:"layer-ph-3"},
+  {n:4,label:t('l4Label'),desc:t('tl4Desc'),ph:"layer-ph-4"}
+];}
+const layerInfoTrunk=getLayerInfoTrunk();
 
 // Zone layer limits
 const zoneMaxLayers={capota:1,firewall:2,doors_front:4,doors_rear:4,floor:2,trunk:null,roof:2,arch_front:2,arch_rear:2,trunk_main:3,trunk_door:3};
 
 // Zones displayed as pairs
-const zonePairSuffix={doors_front:" (ambele, ×2)",doors_rear:" (ambele, ×2)",arch_front:" (ambele, ×2)",arch_rear:" (ambele, ×2)"};
+const zonePairSuffix={doors_front:t('pairSuffix'),doors_rear:t('pairSuffix'),arch_front:t('pairSuffix'),arch_rear:t('pairSuffix')};
 
 // Quality config: layers → quality → [{prodId, cov}]
 const qualityDef={
   basic:{
-    name:"Basic",icon:"🔵",desc:"Dr. Artex VibroMax + Audio System Neoprene — entry-level, raport excelent calitate/preț",
+    name:"Basic",icon:"🔵",get desc(){return t('q_basicDesc')},
     layers:{
       1:[{p:"vibromax",c:1.0}],
       2:[{p:"vibromax",c:1.0},{p:"neoprene6",c:0.85}],
@@ -2199,7 +2554,7 @@ const qualityDef={
     }
   },
   pro:{
-    name:"Pro",icon:"🟢",desc:"Dr. Artex Earth Iridium + Baffle Integra — performanță bună, raport calitate/preț ridicat",
+    name:"Pro",icon:"🟢",get desc(){return t('q_proDesc')},
     layers:{
       1:[{p:"earthiridium",c:1.0}],
       2:[{p:"earthiridium",c:1.0},{p:"ev_integra",c:0.85}],
@@ -2208,7 +2563,7 @@ const qualityDef={
     }
   },
   luxury:{
-    name:"Luxury",icon:"🟣",desc:"Dr. Artex Earth Gold HD + Baffle Zima + Swell Wave 35 — performanță maximă",
+    name:"Luxury",icon:"🟣",get desc(){return t('q_luxuryDesc')},
     layers:{
       1:[{p:"earthgold",c:1.0}],
       2:[{p:"earthgold",c:1.0},{p:"baffle_zima",c:0.85}],
@@ -2241,10 +2596,11 @@ const qualityEV={
 };
 
 // Trunk sub-zones config
-const trunkSubZones=[
-  {id:"trunk_main",name:"Podea + laterale portbagaj",icon:"🪵",desc:"Podeaua și pereții laterali ai portbagajului — materiale diferite pentru fiecare suprafață",maxLayers:3},
-  {id:"trunk_door",name:"Haion / Ușă spate",icon:"🚪",desc:"Materiale ușoare recomandate",maxLayers:3,note:"Se recomandă materiale ușoare pentru a nu suprasolicita telescoapele."}
-];
+function getTrunkSubZones(){return[
+  {id:"trunk_main",get name(){return t('tsz_main_name')},get icon(){return t('tsz_main_icon')},get desc(){return t('tsz_main_desc')},maxLayers:3},
+  {id:"trunk_door",get name(){return t('tsz_door_name')},get icon(){return t('tsz_door_icon')},get desc(){return t('tsz_door_desc')},maxLayers:3,get note(){return t('tsz_door_note')}}
+];}
+const trunkSubZones=getTrunkSubZones();
 const trunkSubAreas={
   trunk_main:  [2.15,2.48,3.32,2.70,3.42,4.14,4.74], // trunk_floor+trunk_sides combinat
   trunk_floor: [1.29,1.49,1.99,1.62,2.05,2.48,2.84],
@@ -3447,7 +3803,7 @@ function confirmPackageSwitch(){
 function showPopularPackages(targetId){
   const proceed=()=>{
   trackEvent('popular_packages_open',{car:`${selBrand||''} ${selModel||''}`.trim()});
-  if(!selBrand||!selModel||!selYear){showToast('Selectează mai întâi mașina!');return;}
+  if(!selBrand||!selModel||!selYear){showToast(t('toastSelectCar'));return;}
   _popPkgMountId=targetId||'pop-pkg-content';
   window._popPkgSel=null; window._popPkgQ=null;
   renderPopPkgStep1();
@@ -3474,9 +3830,9 @@ function renderPopPkgStep1(){
   const carLabel=`${selBrand} ${selModel} ${selYear}`;
   const colors={basic:'#2980b9',pro:'#27ae60',luxury:'#8e44ad',ev_elite:'#00897b'};
   let h=`<div style="text-align:center;margin-bottom:18px">
-    <div style="font-size:22px;font-weight:800;color:#1a1a1a">🎯 Pachete Populare</div>
+    <div style="font-size:22px;font-weight:800;color:#1a1a1a">${t('ppTitle')}</div>
     <div style="font-size:13px;color:#888;margin-top:3px">${carLabel}</div>
-    <div style="font-size:11px;color:#1a73e8;margin-top:5px;font-weight:600">Alege combinația potrivită pentru tine</div>
+    <div style="font-size:11px;color:#1a73e8;margin-top:5px;font-weight:600">${t('ppChoosePkg')}</div>
   </div>
   <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:16px" id="pop-pkg-cards">`;
 
@@ -3668,7 +4024,7 @@ function openTrunkSubModal(){
 
 function openZoneModal(zone){
   trackEvent('zone_open',{zone_id:zone,car:`${selBrand||''} ${selModel||''}`.trim()});
-  if(!propulsion){showToast("Selectează mai întâi tipul motorului (Benzină/Diesel/Electric)!");return;}
+  if(!propulsion){showToast(t("toastSelectEngine"));return;}
   // Elimina aura dupa primul click pe zona
   const mc=document.getElementById('mid-col');
   if(mc) mc.classList.remove('car-glow');
@@ -3731,13 +4087,13 @@ function renderStep1(){
   mediaHtml=buildDesktopZoneSideHtml(currentZone,{laborEstimate:laborEstZone});
   if(isDesktop&&!isTrunk){
     mediaHtml+=`<div class="zm-side-intro">
-      <div class="zm-side-intro-title">Pasul 1</div>
-      <div class="zm-side-intro-copy">Alege numărul de straturi din stânga. După selecție, în dreapta apar materialele și prețurile.</div>
+      <div class="zm-side-intro-title">${t('step1Label')}</div>
+      <div class="zm-side-intro-copy">${isTrunk?t('trunkStep1HintCopy'):t('step1HintCopy')}</div>
     </div>`;
   }
   if(!(isDesktop&&!isTrunk)) h+=mediaHtml;
 
-  h+=`<p class="zm-subtitle">Câte straturi de insonorizare vrei pentru <strong>${displayName}</strong>?</p>
+  h+=`<p class="zm-subtitle">${t('howManyLayers')} <strong>${displayName}</strong>?</p>
   <div class="layer-grid">`;
   layerInfo.filter(li=>li.n<=maxL).forEach(li=>{
     // Try real image first, fallback to gradient
@@ -3750,7 +4106,7 @@ function renderStep1(){
       </div>
     </div>`;
   });
-  h+='</div><p class="layer-note">Fotografiile de produs vor fi adăugate ulterior</p>';
+  h+=`</div><p class="layer-note">${t('photoNote')}</p>`;
 
   // Încurajare straturi suplimentare — când userul alege mai puțin decât maximul zonei
   if(currentLayers!==null){
@@ -3761,7 +4117,7 @@ function renderStep1(){
       h+=`<div style="background:#f0faf4;border:1.5px solid #27ae60;border-radius:10px;padding:10px 14px;margin-top:8px;display:flex;gap:10px;align-items:flex-start">
         <span style="font-size:16px;flex-shrink:0">💡</span>
         <div style="font-size:11px;color:#1a5c35;line-height:1.5">
-          Adăugând ${extraLayers===1?'un strat în plus':'încă '+extraLayers+' straturi'}, manopera crește foarte puțin — diferența e de doar <strong>${savedPct}%</strong>. Odată deschisă ușa, montajul straturilor suplimentare nu adaugă mult timp. Poți regreta ulterior că nu ai ales mai mult! 🎵
+          ${extraLayers===1?t('encAdd1'):t('encAddN').replace('{n}',extraLayers)}, ${t('encText').replace('{pct}',savedPct)}
         </div>
       </div>`;
     }
@@ -3775,12 +4131,12 @@ function renderStep1(){
     const titleColor=disasm?'#c0392b':'#b8680a';
     const textColor=disasm?'#6b1515':'#7a5400';
     const icon=disasm?'🔴':'⚠️';
-    const modelNote=disasm&&selBrand?`<strong>${selBrand}${selModel?' '+selModel:''}</strong> face parte din modelele care necesită demontare. `:'La unele modele, ';
+    const modelNote=disasm&&selBrand?`<strong>${selBrand}${selModel?' '+selModel:''}</strong> ${t('doorDisasmNoteModel')}`:'La unele modele, ';
     h+=`<div style="background:${bgColor};border:1.5px solid ${borderColor};border-radius:10px;padding:11px 14px;margin-top:8px;display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:18px;flex-shrink:0">${icon}</span>
       <div>
-        <div style="font-size:11px;font-weight:800;color:${titleColor};margin-bottom:3px">Verificare necesară la preluarea clientului</div>
-        <div style="font-size:11px;color:${textColor};line-height:1.5">${modelNote}accesul la tabla exterioară a ușii necesită demontarea tablei intermediare și a macaralei de geam. <strong>Acest lucru poate influența manopera — costul poate fi mai mare</strong> față de estimarea standard. Colegii noștri vor verifica pentru tine înainte să te sune.</div>
+        <div style="font-size:11px;font-weight:800;color:${titleColor};margin-bottom:3px">${t('doorDisasmTitle')}</div>
+        <div style="font-size:11px;color:${textColor};line-height:1.5">${modelNote}${t('doorDisasmNote')}</div>
       </div>
     </div>`;
   }
@@ -3809,12 +4165,12 @@ function selectLayer(n){
 function renderRoofSunroofStep(){
   const isDesktop=window.innerWidth>=900;
   const opts=[
-    {id:"none",   icon:"🚗", title:"Fără trapă",           desc:"Suprafață completă de plafon", badge:"100% suprafață"},
-    {id:"normal",  icon:"🔲", title:"Trapă normală",         desc:"Se scade 25% din suprafața de material", badge:"-25% suprafață"},
-    {id:"panoramic",icon:"🌅",title:"Trapă panoramică",      desc:"Se scade 50% din suprafața de material", badge:"-50% suprafață"},
+    {id:"none",   icon:"🚗", get title(){return t('noSunroof')},           get desc(){return t('noSunroofDesc')}, get badge(){return t('noSunroofBadge')}},
+    {id:"normal",  icon:"🔲", get title(){return t('normalSunroof')},         get desc(){return t('normalSunroofDesc')}, get badge(){return t('normalSunroofBadge')}},
+    {id:"panoramic",icon:"🌅",get title(){return t('panoramicSunroof')},      get desc(){return t('panoramicSunroofDesc')}, get badge(){return t('panoramicSunroofBadge')}},
   ];
   const baseArea=getArea();
-  let h=`<p class="zm-subtitle">Plafonul tău are trapă? Selectează tipul pentru a calcula suprafața corectă.</p>`;
+  let h=`<p class="zm-subtitle">${t('roofQ')}</p>`;
   opts.forEach(o=>{
     const sel=roofSunroof===o.id;
     const factor=o.id==="panoramic"?0.5:o.id==="normal"?0.75:1.0;
@@ -3837,15 +4193,15 @@ function renderRoofSunroofStep(){
     </div>`;
   });
   h+=`<button class="btn-zm-add${roofSunroof!==''?" show":""}" onclick="confirmRoofSunroof()" style="margin-top:4px">
-    Continuă →
+    ${t('continueArrow')}
   </button>`;
   if(isDesktop){
     renderDesktopSplitStep(
       h,
       buildDesktopZoneSideHtml('roof',{
         laborEstimate:getZoneLaborRON('roof'),
-        hintTitle:'Alege tipul de trapă',
-        hintCopy:'Suprafața utilă a plafonului se recalculează automat în funcție de trapă, apoi continui la materialele potrivite.'
+        hintTitle:t('roofHintTitle'),
+        hintCopy:t('roofHintCopy')
       })
     );
   } else {
@@ -3912,7 +4268,7 @@ function renderStep2(){
   const area=getArea();
   let sunroofNote="";
   if(currentZone==='roof'&&roofSunroof!=='none'){
-    const label=roofSunroof==='panoramic'?"trapă panoramică (-50%)":"trapă normală (-25%)";
+    const label=roofSunroof==='panoramic'?t('sunroofPanoramicLabel'):t('sunroofNormalLabel');
     sunroofNote=`<span style="display:inline-block;margin-left:6px;font-size:10px;font-weight:700;
       color:#e67e22;background:#fffbf0;border:1px solid #f0c030;border-radius:20px;padding:1px 7px">
       🔲 ${label}</span>`;
@@ -3933,7 +4289,7 @@ function renderStep2(){
         <div class="qcard-price">~${price} RON</div>
         <div style="background:var(--red);border-radius:6px;padding:3px 7px;display:flex;align-items:center;gap:4px">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          <span style="font-size:9px;font-weight:700;color:#fff">Adaugă</span>
+          <span style="font-size:9px;font-weight:700;color:#fff">${t('addToCartBtn').replace('🛒 ','')}</span>
         </div>
       </div>
     </div>`;
@@ -3943,20 +4299,20 @@ function renderStep2(){
   const evActive=currentQuality==='ev_elite';
   h+=`<div style="margin-top:8px;border-top:1.5px solid #b2dfdb;padding-top:8px">
     <div style="font-size:9px;font-weight:700;color:#00897b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
-      ⚡ Gamă pentru mașini electrice — materiale ultra-ușoare
+      ${t('evGamLabel')}
     </div>
     <div class="qcard ev_elite-q${evActive?" active":""}" onclick="selectQuality('ev_elite')"
       style="background:${evActive?'#00897b':'#e0f2f1'};border-color:#00897b;transition:background .15s">
       <span class="qcard-icon">⚡</span>
       <div class="qcard-info">
         <div class="qcard-name" style="color:${evActive?'#fff':'#004d40'}">EV Electra</div>
-        <div class="qcard-desc" style="color:${evActive?'rgba(255,255,255,.85)':'#00695c'}">${getQualityDescForLayers('ev_elite')||'EV Blue + EV VibroBarrier — ultra-ușoare'}</div>
+        <div class="qcard-desc" style="color:${evActive?'rgba(255,255,255,.85)':'#00695c'}">${getQualityDescForLayers('ev_elite')||t('evDefault')}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
         <div class="qcard-price" style="color:${evActive?'#fff':'#00897b'}">~${evPrice} RON</div>
         <div style="background:#00897b;border-radius:6px;padding:3px 7px;display:flex;align-items:center;gap:4px">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          <span style="font-size:9px;font-weight:700;color:#fff">Adaugă</span>
+          <span style="font-size:9px;font-weight:700;color:#fff">${t('addToCartBtn').replace('🛒 ','')}</span>
         </div>
       </div>
     </div>
@@ -3966,19 +4322,19 @@ function renderStep2(){
   // Speaker partial option — ONLY for Basic quality on door zones
   if(currentQuality&&isPartialApplicable()){
     h+=`<div style="background:#fffbea;border:1.5px solid #f0c030;border-radius:10px;padding:12px;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#b8860b;margin-bottom:8px">Acoperire uși</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#b8860b;margin-bottom:8px">${t('doorCoverTitle')}</div>
       <div style="display:flex;gap:8px">
         <div onclick="setSubMode('partial')" style="flex:1;padding:9px 8px;border:2px solid ${basicSubMode==='partial'?'var(--red)':'var(--border)'};
           background:${basicSubMode==='partial'?'#fff0ee':'#fff'};border-radius:8px;cursor:pointer;text-align:center;transition:all .2s">
           <div style="font-size:13px">🎵</div>
-          <div style="font-size:11px;font-weight:700;color:${basicSubMode==='partial'?'var(--red)':'var(--text)'}">Doar difuzor</div>
-          <div style="font-size:9px;color:var(--muted);margin-top:1px">~40% suprafață</div>
+          <div style="font-size:11px;font-weight:700;color:${basicSubMode==='partial'?'var(--red)':'var(--text)'}">${t('justSpeaker')}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:1px">${t('justSpeakerDesc')}</div>
         </div>
         <div onclick="setSubMode('full')" style="flex:1;padding:9px 8px;border:2px solid ${basicSubMode==='full'?'var(--red)':'var(--border)'};
           background:${basicSubMode==='full'?'#fff0ee':'#fff'};border-radius:8px;cursor:pointer;text-align:center;transition:all .2s">
           <div style="font-size:13px">✅</div>
-          <div style="font-size:11px;font-weight:700;color:${basicSubMode==='full'?'var(--red)':'var(--text)'}">Suprafață totală</div>
-          <div style="font-size:9px;color:var(--muted);margin-top:1px">100% ușă</div>
+          <div style="font-size:11px;font-weight:700;color:${basicSubMode==='full'?'var(--red)':'var(--text)'}">${t('fullSurface')}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:1px">${t('fullSurfaceDesc')}</div>
         </div>
       </div>
     </div>`;
@@ -3986,7 +4342,7 @@ function renderStep2(){
 
   if(currentQuality){h+=renderMatPreview();}
   // Butonul Adaugă în coș nu mai e necesar — calitatea selectată adaugă direct
-  h+=`<div style="font-size:10px;color:#888;text-align:center;margin-top:8px;padding:4px 8px;background:#f8f8f8;border-radius:6px">📦 Preț estimat doar pentru materiale · include 10% surplus · manopera se calculează separat</div>`;
+  h+=`<div style="font-size:10px;color:#888;text-align:center;margin-top:8px;padding:4px 8px;background:#f8f8f8;border-radius:6px">${t('priceNote')}</div>`;
 
   // Pe desktop split: actualizeaza doar coloana dreapta
   const rightCol=document.getElementById('zm-col-r');
@@ -4007,14 +4363,14 @@ function setSubMode(mode){
 function renderMatPreview(){
   const area=getEffectiveArea();
   const layers=getQualityLayers(currentQuality);
-  let h='<div class="mat-preview"><div class="mat-preview-title">Materiale incluse</div>';
+  let h=`<div class="mat-preview"><div class="mat-preview-title">${t('matIncluded')}</div>`;
   layers.forEach((l,idx)=>{
     const p=prods[l.p];
     const sheets=Math.ceil(area*l.c*1.1/p.m2);
     const cost=sheets*p.price[propulsion];
     h+=`<div class="mat-row">
       <div>
-        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#6e6e73;margin-bottom:2px">Stratul ${idx+1}</div>
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#6e6e73;margin-bottom:2px">${t('layerN')} ${idx+1}</div>
         <div class="mat-name">${p.name}</div>
         <div class="mat-detail">${p.brand} · ${sheets} coli · ${p.m2}m²/coală · acoperire ${Math.round(l.c*100)}%</div>
       </div>
@@ -4132,7 +4488,7 @@ function addZoneToCart(skipCarCheck, forceReplace){
   updateCartUI();
   update3DZones();
   saveSession();
-  bounceCart();showToast(`✓ ${zoneNames[currentZone]||currentZone} adăugat în coș!`);
+  bounceCart();showToast(`✓ ${zoneNames[currentZone]||currentZone} ${t('toastAdded')}`);
 }
 
 // ════════════ CAR CHANGE HANDLERS ════════════
@@ -4164,7 +4520,7 @@ function updateCartUI(){
   const strip=document.getElementById("cart-strip");
   if(n>0){
     strip.classList.add("show");
-    document.getElementById("cs-label").textContent=`${n} zonă${n>1?"e":""} configurată${n>1?"e":""}`;
+    document.getElementById("cs-label").textContent=`${n} ${n===1?t('zonesCfg1'):t('zonesCfgN')}`;
     document.getElementById("cs-total").textContent=ron(total)+" RON";
   } else strip.classList.remove("show");
 
@@ -4273,7 +4629,7 @@ function openCart(){
   const n=cartItems.length;
   const total=cartItems.reduce((s,i)=>s+i.total,0);
   let h="";
-  if(!n) h='<p style="color:var(--muted);font-size:12px;padding:20px 0;text-align:center">Coșul este gol</p>';
+  if(!n) h=`<p style="color:var(--muted);font-size:12px;padding:20px 0;text-align:center">${t('cartEmptyMsg')}</p>`;
   else {
     // Group by carLabel
     const groups=groupCartItemsByVehicle(cartItems);
@@ -4294,7 +4650,7 @@ function openCart(){
               <span class="cart-item-del" onclick="removeZone('${it.id}');renderCartModal()">🗑</span>
             </div>
           </div>
-          <div class="cart-item-det">${it.layers!=="-"?it.layers+" straturi · ":""}${it.quality}${it.area>0?" · ~"+it.area.toFixed(1)+" m²":""}</div>
+          <div class="cart-item-det">${it.layers!=="-"?it.layers+" "+t('straturiStr')+" · ":""}${it.quality}${it.area>0?" · ~"+it.area.toFixed(1)+" m²":""}</div>
           <div class="cart-item-det" style="font-weight:700;color:#6b625c">${getVehicleDisplayName(it)}</div>
           ${it.lines&&it.lines.length?(()=>{
             let stratIdx=0;
@@ -4309,7 +4665,7 @@ function openCart(){
               if(!m) return '';
               stratIdx++;
               return `<div style="font-size:10px;color:#555;padding:1px 0;display:flex;justify-content:space-between">
-                <span><strong style="color:#c0392b">Strat ${stratIdx}:</strong> ${m[1]}</span>
+                <span><strong style="color:#c0392b">${t('stratLabel')} ${stratIdx}:</strong> ${m[1]}</span>
                 <strong style="color:#333">${m[2]} coli</strong>
               </div>`;
             }).join('')}
@@ -4399,11 +4755,11 @@ function addProToCart(){
 
 // ════════════ TRUNK SUB-ZONE FLOW ════════════
 function renderTrunkSubSelect(){
-  document.getElementById("zm-zone-name").textContent="Portbagaj";
+  document.getElementById("zm-zone-name").textContent=t('trunkTitle');
   document.getElementById("zm-back").style.visibility="hidden";
   const isDesktop=window.innerWidth>=900;
   const activeItems=getActiveVehicleCartItems();
-  let h=`<p class="zm-subtitle">Apasă pe o zonă pentru a o configura:</p><div class="trunk-sub-grid">`;
+  let h=`<p class="zm-subtitle">${t('trunkSubQ')}</p><div class="trunk-sub-grid">`;
   trunkSubZones.forEach(sz=>{
     const configured=activeItems.some(i=>i.zone===sz.id);
     const cartItem=activeItems.find(i=>i.zone===sz.id);
@@ -4424,14 +4780,14 @@ function renderTrunkSubSelect(){
   h+=`</div>`;
   const anyConfigured=trunkSubZones.some(sz=>activeItems.some(i=>i.zone===sz.id));
   if(anyConfigured){
-    h+=`<button class="btn-zm-add show" onclick="closeZoneModal()" style="margin-top:4px">✓ Gata cu portbagajul</button>`;
+    h+=`<button class="btn-zm-add show" onclick="closeZoneModal()" style="margin-top:4px">${t('trunkDone')}</button>`;
   }
   if(isDesktop){
     renderDesktopSplitStep(
       h,
       `<div class="zm-side-intro">
-        <div class="zm-side-intro-title">Selectează o sub-zonă</div>
-        <div class="zm-side-intro-copy">Podeaua, lateralele și haionul au construcții diferite, deci se configurează separat. După selecție, în dreapta apar materialele și estimările.</div>
+        <div class="zm-side-intro-title">${t('trunkSelectTitle')}</div>
+        <div class="zm-side-intro-copy">${t('trunkSelectHint')}</div>
       </div>`
     );
   } else {
@@ -4502,7 +4858,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
     // Podea: rețetă dedicată cu n straturi selectate
     const floorArea=(trunkSubAreas.trunk_floor[idx])||1.0;
     const floorLayers=qualityTrunkFloor[currentQuality].layers[currentLayers]||[];
-    lines.push('__section:🪵 Podea__');
+    lines.push('__section:'+t('sectionFloor')+'__');
     floorLayers.forEach(l=>{
       const p=prods[l.p]; const sheets=Math.ceil(floorArea*l.c*1.1/p.m2);
       const cost=sheets*p.price[propulsion]; total+=cost;
@@ -4511,7 +4867,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
     // Laterale: mereu 2 straturi cu materiale subțiri
     const sidesArea=(trunkSubAreas.trunk_sides[idx])||0.8;
     const sidesLayers=qualityTrunkSides[currentQuality].layers;
-    lines.push('__section:🧱 Laterale (max 9-10mm)__');
+    lines.push('__section:'+t('sectionSides')+'__');
     sidesLayers.forEach(l=>{
       const p=prods[l.p]; const sheets=Math.ceil(sidesArea*l.c*1.1/p.m2);
       const cost=sheets*p.price[propulsion]; total+=cost;
@@ -4562,7 +4918,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
   const lb=document.querySelector('.lbtn[data-zone="trunk"]');
   if(lb){lb.classList.remove('configured-basic','configured-pro','configured-luxury');lb.classList.add(trunkQClass);}
   updateCartUI();
-  bounceCart();showToast(`✓ ${sz.name} adăugat în coș!`);
+  bounceCart();showToast(`✓ ${sz.name} ${t('toastAdded')}`);
   // Go back to trunk sub-zone list
   currentLayers=null; currentQuality=null;
   renderTrunkSubSelect();
@@ -4570,7 +4926,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
 
 // ════════════ CHECKOUT ════════════
 function openCheckout(){
-  if(!cartItems.length){showToast("Coșul este gol!");return;}
+  if(!cartItems.length){showToast(t('toastEmptyCart'));return;}
   trackEvent('checkout_open',{items:cartItems.length,car:`${selBrand||''} ${selModel||''}`.trim()});
   document.getElementById("checkout-content").innerHTML=renderCheckoutStep1();
   document.getElementById("checkout-bg").classList.add("show");
@@ -4626,8 +4982,8 @@ function renderCheckoutStep1(){
     </div>`;
   }
   return `<div class="checkout-step">
-    <div style="font-size:16px;font-weight:800;margin-bottom:4px">🛒 Rezumat comandă</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Verifică materialele înainte de finalizare</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">${t('chkSummaryTitle')}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">${t('chkVerify')}</div>
     ${vehicleSummary}
     <div class="mat-summary-block">${matH}
       ${getDiscountPct()>0?`
@@ -4639,24 +4995,24 @@ function renderCheckoutStep1(){
         <span>-${(total-getDiscountedMaterialsRON()).toLocaleString('ro-RO')} RON</span>
       </div>`:''}
       <div class="mat-summary-row" style="border-top:1.5px solid var(--border);padding-top:6px;margin-top:4px">
-        <span style="font-weight:700">Total materiale</span>
+        <span style="font-weight:700">${t('totalMatShort')}</span>
         <strong style="color:var(--red);font-size:16px">${getDiscountedMaterialsRON().toLocaleString('ro-RO')} RON</strong>
       </div>
     </div>
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px">Ai nevoie și de montaj?</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px">${t('chkNeedInstall')}</div>
     <div class="montaj-card" onclick="showMontajYes()">
       <div class="montaj-card-icon">🔧</div>
-      <div class="montaj-card-title">Da, vreau montaj profesional</div>
-      <div class="montaj-card-desc">Calculăm costul manoperei pentru mașina ta</div>
+      <div class="montaj-card-title">${t('chkWithInstallTitle')}</div>
+      <div class="montaj-card-desc">${t('chkWithInstallDesc')}</div>
     </div>
     <div class="montaj-card" onclick="selectedLaborCost=0;_withMontaj=false;showDiyTools()">
       <div class="montaj-card-icon">🎥</div>
-      <div class="montaj-card-title">Nu, îl montez eu singur</div>
-      <div class="montaj-card-desc">Acces la librăria video de tutoriale gratuite</div>
+      <div class="montaj-card-title">${t('chkDiyTitle')}</div>
+      <div class="montaj-card-desc">${t('chkDiyDesc')}</div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px">
-      <button onclick="closeCheckout()" style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-size:12px;font-weight:700;cursor:pointer">← Înapoi</button>
-      <button onclick="_withMontaj=false;selectedLaborCost=0;showDiyTools()" style="flex:1;padding:12px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">Continuă →</button>
+      <button onclick="closeCheckout()" style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-size:12px;font-weight:700;cursor:pointer">${t('backBtn')}</button>
+      <button onclick="_withMontaj=false;selectedLaborCost=0;showDiyTools()" style="flex:1;padding:12px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">${t('continueArrow')}</button>
     </div>
   </div>`;
 }
@@ -4863,45 +5219,45 @@ function showCustomerForm(){
       <button onclick="showCitySelect()" style="margin-left:auto;padding:4px 10px;border:1px solid #e74c3c;border-radius:6px;background:#fff;color:#e74c3c;font-size:10px;font-weight:700;cursor:pointer">Schimbă</button>
     </div>`:'';
   document.getElementById("checkout-content").innerHTML=`<div class="checkout-step">
-    <div style="font-size:16px;font-weight:800;margin-bottom:4px">📋 Datele tale de contact</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Necesare pentru oferta pe care o transmitem echipei noastre</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">${t('cfTitle')}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${t('cfSub')}</div>
     ${cityBadge}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">Prenume *</label>
+        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">${t('cfFirstName')} *</label>
         <input id="cf-fname" type="text" placeholder="Ion" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box">
       </div>
       <div>
-        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">Nume *</label>
+        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">${t('cfLastName')} *</label>
         <input id="cf-lname" type="text" placeholder="Popescu" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box">
       </div>
     </div>
     <div style="margin-bottom:10px">
-      <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">📱 Telefon *</label>
+      <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">${t('cfPhone')} *</label>
       <input id="cf-phone" type="tel" placeholder="07XX XXX XXX" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box">
     </div>
     <div style="margin-bottom:10px">
-      <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">Email *</label>
+      <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">${t('cfEmail')} *</label>
       <input id="cf-email" type="email" placeholder="ion.popescu@email.ro" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box">
     </div>
     <div style="margin-bottom:10px">
-      <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">📬 Adresă *</label>
+      <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">${t('cfAddress')} *</label>
       <input id="cf-address" type="text" placeholder="Str. Exemplu nr. 10, Bloc A, Ap. 5" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box">
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">Oraș *</label>
+        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">${t('cfCity')} *</label>
         <input id="cf-city-del" type="text" placeholder="Cluj-Napoca" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box">
       </div>
       <div>
-        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">Județ *</label>
+        <label style="font-size:11px;font-weight:700;color:#555;display:block;margin-bottom:4px">${t('cfCounty')} *</label>
         <input id="cf-county" type="text" placeholder="Cluj" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box">
       </div>
     </div>
 
     <div id="cf-error" style="color:#e74c3c;font-size:11px;margin-bottom:8px;display:none"></div>
-    <button onclick="validateAndGoPayment()" style="width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">Continuă → Metodă de plată</button>
-    <button onclick="${_withMontaj?'showCitySelect()':'document.getElementById(\'checkout-content\').innerHTML=renderCheckoutStep1()'}" style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-size:12px;cursor:pointer">← Înapoi</button>
+    <button onclick="validateAndGoPayment()" style="width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">${t('cfContinueBtn')}</button>
+    <button onclick="${_withMontaj?'showCitySelect()':'document.getElementById(\'checkout-content\').innerHTML=renderCheckoutStep1()'}" style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-size:12px;cursor:pointer">${t('backBtn')}</button>
   </div>`;
 }
 
@@ -5063,10 +5419,10 @@ function submitCustomerForm(){
   };
   ['cf-fname','cf-lname','cf-phone','cf-email'].forEach(clearErr);
   let hasErr=false;
-  if(!fname){inlineErr('cf-fname','Prenumele este obligatoriu.');hasErr=true;}
-  if(!lname){inlineErr('cf-lname','Numele este obligatoriu.');hasErr=true;}
-  if(!phone){inlineErr('cf-phone','Telefonul este obligatoriu.');hasErr=true;}
-  if(!email||!email.includes('@')){inlineErr('cf-email','Email invalid.');hasErr=true;}
+  if(!fname){inlineErr('cf-fname',t('errFirstLast'));hasErr=true;}
+  if(!lname){inlineErr('cf-lname',t('errFirstLast'));hasErr=true;}
+  if(!phone){inlineErr('cf-phone',t('errPhone'));hasErr=true;}
+  if(!email||!email.includes('@')){inlineErr('cf-email',t('errEmail'));hasErr=true;}
   if(hasErr) return;
   const cfErr=document.getElementById('cf-error');
   if(cfErr) cfErr.style.display='none';
@@ -5457,13 +5813,13 @@ function finalizeOrder(customer){
     <div style="width:80px;height:80px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(39,174,96,.35)">
       <span style="font-size:38px">✅</span>
     </div>
-    <div style="font-size:20px;font-weight:900;color:#1a1a2e;margin-bottom:6px">Mulțumim, ${customer.fname}! 🎉</div>
-    <div style="font-size:13px;color:#444;margin-bottom:4px;line-height:1.5">Comanda ta a fost înregistrată cu succes.</div>
-    <div style="font-size:13px;color:#444;margin-bottom:18px;line-height:1.5">Un coleg din echipa EdoTec te va contacta <strong>în cel mai scurt timp</strong> pentru a confirma detaliile și a stabili livrarea.</div>
+    <div style="font-size:20px;font-weight:900;color:#1a1a2e;margin-bottom:6px">${t('thankYouTitle').replace('{name}',customer.fname)}</div>
+    <div style="font-size:13px;color:#444;margin-bottom:4px;line-height:1.5">${t('successMsg')}</div>
+    <div style="font-size:13px;color:#444;margin-bottom:18px;line-height:1.5">${t('successMsg2')}</div>
 
     <!-- Sumar comanda -->
     <div style="background:#f8f9fa;border-radius:12px;padding:14px;text-align:left;margin-bottom:14px;border:1.5px solid #eee">
-      <div style="font-size:10px;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📋 Sumar comandă</div>
+      <div style="font-size:10px;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${t('orderSumSmall')}</div>
       <div style="font-size:12px;color:#333;margin-bottom:3px">👤 ${customer.fname} ${customer.lname} · ${customer.phone}</div>
       ${carInfo?`<div style="font-size:12px;color:#333;margin-bottom:3px">🚗 ${carInfo}</div>`:''}
       ${customer.address||customer.cityDel?`<div style="font-size:12px;color:#333;margin-bottom:3px">📦 ${[customer.address,customer.cityDel,customer.county].filter(Boolean).join(', ')}</div>`:''}
@@ -5478,12 +5834,12 @@ function finalizeOrder(customer){
 
     <!-- Confirmare email -->
     <div style="background:#e8f8f0;border:1.5px solid #27ae60;border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:left">
-      <div style="font-size:12px;color:#1a6b35;font-weight:700;margin-bottom:2px">✉️ Confirmare trimisă pe email</div>
+      <div style="font-size:12px;color:#1a6b35;font-weight:700;margin-bottom:2px">${t('emailConfirmSent')}</div>
       <div style="font-size:11px;color:#2d7a4a">${customer.email}</div>
     </div>
 
     <button onclick="closeCheckout()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1a1a2e,#2c3e50);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.3px">
-      ✨ Închide — ne vedem curând!
+      ${t('closeSuccess')}
     </button>
   </div>`;
 }
@@ -5551,7 +5907,7 @@ function calcPkgQuality(quality, layersOverride){
 function showFullPackage(targetId){
   const proceed=()=>{
   trackEvent('full_package_open',{car:`${selBrand||''} ${selModel||''}`.trim()});
-  if(!propulsion){showToast('Selectează mai întâi marca, modelul și tipul motorului!');return;}
+  if(!propulsion){showToast(t('toastSelectEngine'));return;}
   _fullPkgMountId=targetId||'full-pkg-content';
   const carLabel=selBrand&&selModel?`${selBrand} ${selModel} ${selYear}`:'';
 
@@ -5584,13 +5940,13 @@ function showFullPackage(targetId){
 
   let html=`
     <div style="text-align:center;margin-bottom:16px">
-      <div style="font-size:22px;font-weight:800;color:#1a1a1a">🚗 Pachet Complet</div>
+      <div style="font-size:22px;font-weight:800;color:#1a1a1a">${t('fpTitle')}</div>
       ${carLabel?`<div style="font-size:13px;color:#888;margin-top:3px">${carLabel}</div>`:''}
       <div style="font-size:12px;color:#d63031;font-weight:700;margin-top:5px">~${totalArea} m² suprafață totală</div>
     </div>
     <div style="background:#f0f4ff;border:1px solid #c8d8f8;border-radius:10px;padding:9px 12px;
       margin-bottom:14px;font-size:11px;color:#3a5080;line-height:1.5;text-align:center">
-      Alege calitatea materialelor ${(()=>{
+      ${t('fpChooseQ')} ${(()=>{
         const si=laborSizeIdx[bodyClass]||1;
         let fullLaborEst=eligibleFullPkgZones.reduce((s,z)=>{
           if(z.zone==='arch_front'||z.zone==='arch_rear') return s;
@@ -5641,7 +5997,7 @@ function showFullPackage(targetId){
     <button id="pkg-add-btn" onclick="confirmFullPackage()" disabled
       style="width:100%;padding:14px;background:#ccc;color:#fff;border:none;border-radius:12px;
       font-size:15px;font-weight:800;cursor:not-allowed;transition:all .2s;margin-bottom:14px">
-      🛒 Selectează o calitate mai întâi
+      ${t('fpSelectFirst')}
     </button>
 
     <!-- Info estimare manopera - doar informativ -->
@@ -5649,8 +6005,8 @@ function showFullPackage(targetId){
       margin-bottom:14px;display:flex;align-items:center;gap:10px">
       <div style="font-size:20px">🔧</div>
       <div style="flex:1">
-        <div style="font-size:11px;font-weight:700;color:#e67e22">Estimare manoperă montaj</div>
-        <div style="font-size:10px;color:#888;margin-top:2px">Poți alege la pasul următor dacă vrei instalare profesională · ${laborAgeMeta.publicLabel}</div>
+        <div style="font-size:11px;font-weight:700;color:#e67e22">${t('fpLaborTitle')}</div>
+        <div style="font-size:10px;color:#888;margin-top:2px">${t('fpLaborDesc')} · ${laborAgeMeta.publicLabel}</div>
       </div>
       <div style="font-size:16px;font-weight:900;color:#e67e22">~${laborDiscount.discounted} RON</div>
     </div>
@@ -5658,7 +6014,7 @@ function showFullPackage(targetId){
 
     <details style="margin-bottom:14px">
       <summary style="font-size:11px;font-weight:700;color:#aaa;cursor:pointer;padding:6px 0;
-        border-top:1px solid #f0f0f0">▾ Zone incluse (${eligibleFullPkgZones.length} zone, ~${totalArea} m²)</summary>
+        border-top:1px solid #f0f0f0">${t('fpZonesDetail').replace('{n}',eligibleFullPkgZones.length).replace('{a}',totalArea)}</summary>
       <table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:8px">
         <tr style="color:#bbb;font-size:10px">
           <th style="text-align:left;padding:3px 6px">Zonă</th>
@@ -5679,7 +6035,7 @@ function showFullPackage(targetId){
     </tr></table>
   </details>
   <p style="font-size:10px;color:#ccc;text-align:center">
-    * Estimare. Prețul final depinde de starea mașinii și instalatorul ales.
+    ${t('fpEstNote')}
   </p>`;
 
   document.getElementById(_fullPkgMountId).innerHTML=html;
@@ -5734,7 +6090,7 @@ function selectPkgQuality(q){
     btn.style.background=`linear-gradient(135deg,${c},${c}cc)`;
     btn.style.cursor='pointer';
     btn.style.boxShadow=`0 4px 14px ${c}55`;
-    btn.textContent='🛒 Adaugă în coș';
+    btn.textContent=t('fpAddCart');
   }
 }
 
@@ -5861,7 +6217,7 @@ function addFullPackageToCart(quality, includeLabor){
   bounceCart();
   const msg=includeLabor
     ?`✓ Pachet ${qName} + manoperă adăugate în coș!`
-    :`✓ Pachet ${qName} (materiale) adăugat în coș!`;
+    :`✓ Pachet ${qName} ${t('pkgMaterialsAdded')}`;
   showToast(msg);
 }
 
