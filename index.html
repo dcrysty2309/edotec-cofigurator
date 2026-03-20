@@ -2360,22 +2360,18 @@ function getZoneReferenceArea(zone, sizeIdx){
   return (surfaces[zone]&&surfaces[zone][sizeIdx])||1.0;
 }
 function getLaborLayerFactor(zone, layers){
+  // Logică manoperă per număr straturi selectate vs maxim posibil:
+  // maxLayers=1: întotdeauna 100%
+  // maxLayers=2: 2 straturi=100%, 1 strat=-12% (88%)
+  // maxLayers≥3: 3+ straturi=100%, 2 straturi=-12% (88%), 1 strat=-20% (80%)
   const maxLayers=zoneMaxLayers[zone]||layers||1;
   const safeLayers=Math.max(1,Math.min(layers||maxLayers,maxLayers));
-  if(maxLayers<=1) return 1;
-  if(maxLayers===2) return safeLayers===1?0.84:1;
-  if(maxLayers===3){
-    if(safeLayers===1) return 0.80;
-    if(safeLayers===2) return 0.90;
-    return 1;
-  }
-  if(maxLayers===4){
-    if(safeLayers===1) return 0.80;
-    if(safeLayers===2) return 0.86;
-    if(safeLayers===3) return 0.93;
-    return 1;
-  }
-  return 1;
+  if(maxLayers<=1) return 1.0;
+  if(maxLayers===2) return safeLayers>=2?1.0:0.88;
+  // maxLayers >= 3
+  if(safeLayers>=3) return 1.0;     // 3 sau 4 straturi = manoperă completă
+  if(safeLayers===2) return 0.88;   // 2 straturi = -12%
+  return 0.80;                       // 1 strat = -20%
 }
 function getLaborAreaFactorForItem(it,sizeIdx){
   const refArea=Math.max(getZoneReferenceArea(it.zone,sizeIdx),0.1);
@@ -3755,6 +3751,21 @@ function renderStep1(){
     </div>`;
   });
   h+='</div><p class="layer-note">Fotografiile de produs vor fi adăugate ulterior</p>';
+
+  // Încurajare straturi suplimentare — când userul alege mai puțin decât maximul zonei
+  if(currentLayers!==null){
+    const maxL=propulsion==="ev"?Math.min(zoneMaxLayers[currentZone]||4,3):zoneMaxLayers[currentZone]||4;
+    if(currentLayers<maxL&&maxL>=3){
+      const savedPct=currentLayers===1?20:12;
+      const extraLayers=maxL-currentLayers;
+      h+=`<div style="background:#f0faf4;border:1.5px solid #27ae60;border-radius:10px;padding:10px 14px;margin-top:8px;display:flex;gap:10px;align-items:flex-start">
+        <span style="font-size:16px;flex-shrink:0">💡</span>
+        <div style="font-size:11px;color:#1a5c35;line-height:1.5">
+          Adăugând ${extraLayers===1?'un strat în plus':'încă '+extraLayers+' straturi'}, manopera crește foarte puțin — diferența e de doar <strong>${savedPct}%</strong>. Odată deschisă ușa, montajul straturilor suplimentare nu adaugă mult timp. Poți regreta ulterior că nu ai ales mai mult! 🎵
+        </div>
+      </div>`;
+    }
+  }
 
   // Avertizare demontare tablă intermediară — la toate selecțiile de uși
   if(isDoorZone()&&currentLayers>=1){
@@ -5871,11 +5882,22 @@ function toggleTheme(){
 }
 
 function initTheme(){
-  let saved='light';
-  try{
-    saved=localStorage.getItem('edotecTheme')||'light';
-  }catch(err){}
-  applyTheme(saved);
+  let saved=null;
+  try{ saved=localStorage.getItem('edotecTheme'); }catch(err){}
+  if(saved){
+    applyTheme(saved);
+  } else {
+    // Urmează preferința sistemului (OS/browser) — include auto-dark bazat pe oră/sezon
+    const prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(prefersDark?'dark':'light');
+    // Ascultă schimbările automate ale sistemului (ex: OS trece în dark la apus)
+    try{
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{
+        // Respectă doar dacă utilizatorul nu a ales manual o temă
+        if(!localStorage.getItem('edotecTheme')) applyTheme(e.matches?'dark':'light');
+      });
+    }catch(err){}
+  }
 }
 
 initTheme();
