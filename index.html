@@ -2461,6 +2461,24 @@ const EV_ONLY_MODELS={
   "Xpeng":    ["G6","G9","P5","P7"],
 };
 
+// Modele care necesită demontarea tablei intermediare + macaralei de geam pentru acces tabla exterioară ușă
+// null = toate modelele brandului; array = modele specifice
+const DOOR_DISASSEMBLY_MODELS={
+  "Skoda":         ["Octavia 2"],
+  "Volkswagen":    ["Tiguan","Touareg"],
+  "Ford":          ["Fusion","Mondeo"],
+  "Mercedes-Benz": null  // toate modelele
+};
+
+function requiresDoorDisassembly(){
+  if(!selBrand) return false;
+  if(!(selBrand in DOOR_DISASSEMBLY_MODELS)) return false;
+  const models=DOOR_DISASSEMBLY_MODELS[selBrand];
+  if(models===null) return true; // toate modelele brandului
+  if(!selModel) return false;
+  return models.some(m=>selModel.toLowerCase().includes(m.toLowerCase()));
+}
+
 // Zone ascunse per tip varianta
 const variantHiddenZones={
   coupe:  ["doors_rear"],
@@ -3734,13 +3752,20 @@ function renderStep1(){
   });
   h+='</div><p class="layer-note">Fotografiile de produs vor fi adăugate ulterior</p>';
 
-  // Avertizare demontare tablă intermediară — doar la uși cu 3-4 straturi
+  // Avertizare demontare tablă intermediară — la toate selecțiile de uși
   if(isDoorZone()&&currentLayers>=1){
-    h+=`<div style="background:#fffbea;border:1.5px solid #f0c030;border-radius:10px;padding:11px 14px;margin-top:8px;display:flex;gap:10px;align-items:flex-start">
-      <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    const disasm=requiresDoorDisassembly();
+    const bgColor=disasm?'#fff0f0':'#fffbea';
+    const borderColor=disasm?'#e74c3c':'#f0c030';
+    const titleColor=disasm?'#c0392b':'#b8680a';
+    const textColor=disasm?'#6b1515':'#7a5400';
+    const icon=disasm?'🔴':'⚠️';
+    const modelNote=disasm&&selBrand?`<strong>${selBrand}${selModel?' '+selModel:''}</strong> face parte din modelele care necesită demontare. `:'La unele modele, ';
+    h+=`<div style="background:${bgColor};border:1.5px solid ${borderColor};border-radius:10px;padding:11px 14px;margin-top:8px;display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0">${icon}</span>
       <div>
-        <div style="font-size:11px;font-weight:800;color:#b8680a;margin-bottom:3px">Verificare necesară la preluarea clientului</div>
-        <div style="font-size:11px;color:#7a5400;line-height:1.5">La unele modele de mașini, accesul la tabla exterioară a ușii necesită demontarea tablei intermediare și a macaralei de geam. <strong>Acest lucru poate influența manopera — costul poate fi mai mare</strong> față de estimarea standard. Colegii noștri vor verifica pentru tine înainte să te sune.</div>
+        <div style="font-size:11px;font-weight:800;color:${titleColor};margin-bottom:3px">Verificare necesară la preluarea clientului</div>
+        <div style="font-size:11px;color:${textColor};line-height:1.5">${modelNote}accesul la tabla exterioară a ușii necesită demontarea tablei intermediare și a macaralei de geam. <strong>Acest lucru poate influența manopera — costul poate fi mai mare</strong> față de estimarea standard. Colegii noștri vor verifica pentru tine înainte să te sune.</div>
       </div>
     </div>`;
   }
@@ -5122,10 +5147,10 @@ function sendOfferEmail(customer){
         <tr style="background:#e74c3c;color:#fff"><td style="padding:12px 8px;font-size:14px;font-weight:900">TOTAL ESTIMAT</td><td style="padding:12px 8px;text-align:right;font-size:16px;font-weight:900">${(grandTotal+diyTotal).toLocaleString('ro-RO')} RON</td></tr>
       </tfoot>
     </table>
-    ${cartItems.some(it=>doorZones.includes(it.zone))?`<div style="background:#fffbea;border:1.5px solid #f0c030;border-radius:8px;padding:12px 16px;margin-bottom:16px">
-      <div style="font-size:11px;font-weight:800;color:#b8680a;margin-bottom:4px">⚠️ Notă pentru echipa de montaj</div>
-      <div style="font-size:11px;color:#7a5400;line-height:1.6">Comanda include insonorizare uși cu 3+ straturi. La unele modele de mașini, accesul la tabla exterioară a ușii necesită demontarea tablei intermediare și a macaralei de geam. <strong>Manopera poate fi mai mare față de estimarea standard.</strong> Colegii noștri vor verifica pentru tine înainte să te sune.</div>
-    </div>`:''}
+    ${cartItems.some(it=>doorZones.includes(it.zone))?(()=>{const disasm=requiresDoorDisassembly();return `<div style="background:${disasm?'#fff0f0':'#fffbea'};border:1.5px solid ${disasm?'#e74c3c':'#f0c030'};border-radius:8px;padding:12px 16px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:800;color:${disasm?'#c0392b':'#b8680a'};margin-bottom:4px">${disasm?'🔴':'⚠️'} Notă pentru echipa de montaj</div>
+      <div style="font-size:11px;color:${disasm?'#6b1515':'#7a5400'};line-height:1.6">${disasm&&selBrand?`<strong>${selBrand}${selModel?' '+selModel:''}</strong> face parte din modelele care necesită demontarea tablei intermediare și a macaralei de geam pentru acces la tabla exterioară. `:'Comanda include insonorizare uși. La unele modele, demontarea tablei intermediare și a macaralei de geam poate fi necesară. '}<strong>Manopera poate fi mai mare față de estimarea standard.</strong> Colegii noștri vor verifica pentru tine înainte să te sune.</div>
+    </div>`;})():''}
     <div style="font-size:10px;color:#aaa;text-align:center">EdoTec România · edotec.ro · 0364 565 758 · Cantitățile includ 10% surplus de siguranță</div>
   </div>`;
 
