@@ -1755,10 +1755,15 @@ pkgMaterialsAdded:"(материали) добавено в количката!"
 
 function detectLang(){
   try{const saved=localStorage.getItem('edotecLang');if(saved&&LANG[saved])return saved;}catch(e){}
-  const lang=(navigator.language||navigator.userLanguage||'en').toLowerCase();
-  if(lang.startsWith('ro'))return 'ro';
-  if(lang.startsWith('hu'))return 'hu';
-  if(lang.startsWith('bg'))return 'bg';
+  // Verificăm întreaga listă de limbi a browserului (navigator.languages[])
+  // nu doar prima — Chrome poate avea engleza pe locul 1 chiar dacă UI-ul e în română
+  const langs=((navigator.languages&&navigator.languages.length)?
+    Array.from(navigator.languages):[navigator.language||navigator.userLanguage||'en'])
+    .map(function(l){return l.toLowerCase();});
+  // Prioritate: RO > HU > BG > EN (dacă oricare apare în lista browserului)
+  if(langs.some(function(l){return l.startsWith('ro');}))return 'ro';
+  if(langs.some(function(l){return l.startsWith('hu');}))return 'hu';
+  if(langs.some(function(l){return l.startsWith('bg');}))return 'bg';
   return 'en';
 }
 let currentLang=detectLang();
