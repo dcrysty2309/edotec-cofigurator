@@ -2349,7 +2349,9 @@ const laborSizeIdx={hatchback:0,sedan:1,suv_small:1,large_sedan:2,suv_medium:2,s
 function getZoneLaborRON(zone){
   const si=laborSizeIdx[bodyClass]||1;
   if(zone==='arch_front'||zone==='arch_rear') return 700; // pereche carenaje
-  return (laborMatrix[zone]&&laborMatrix[zone][si])||0;
+  const base=(laborMatrix[zone]&&laborMatrix[zone][si])||0;
+  const disasmFactor=(doorZones.includes(zone)&&requiresDoorDisassembly())?1.30:1.0;
+  return Math.round(base*disasmFactor);
 }
 function getZoneReferenceArea(zone, sizeIdx){
   if(zone&&zone.startsWith('trunk_')){
@@ -2389,7 +2391,9 @@ function getLaborEstimateForItem(it,sizeIdx){
   if(!baseRon) return 0;
   const layerFactor=getLaborLayerFactor(zone,it.layers);
   const areaFactor=getLaborAreaFactorForItem(it,sizeIdx);
-  return Math.round(baseRon*layerFactor*areaFactor);
+  // +30% manoperă la uși pentru modele care necesită demontare tablă intermediară
+  const disasmFactor=(doorZones.includes(zone)&&requiresDoorDisassembly())?1.30:1.0;
+  return Math.round(baseRon*layerFactor*areaFactor*disasmFactor);
 }
 function getLaborDiscountPct(laborRon){
   if(laborRon>10000) return 7;
