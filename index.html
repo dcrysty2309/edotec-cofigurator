@@ -2827,7 +2827,11 @@ const EV_ONLY_MODELS={
 const DOOR_DISASSEMBLY_MODELS={
   "Škoda":         [{model:"Octavia",yearFrom:2004,yearTo:2013}], // Octavia gen 2
   "Skoda":         [{model:"Octavia",yearFrom:2004,yearTo:2013}], // fallback fără diacritic
-  "Volkswagen":    [{model:"Tiguan"},{model:"Touareg"}],
+  "Volkswagen":    [
+    {model:"Tiguan",yearFrom:2007,yearTo:2016},   // gen 1 (5N)
+    {model:"Touareg",yearFrom:2002,yearTo:2010},   // 7L (gen 1)
+    {model:"Touareg",yearFrom:2010,yearTo:2018}    // 7P (gen 2)
+  ],
   "Ford":          [{model:"Fusion"},{model:"Mondeo"}],
   "Mercedes-Benz": null  // toate modelele
 };
