@@ -2759,11 +2759,11 @@ function applyLaborDiscount(laborRon){
 }
 function getLaborBadgeHtml(ronAmount, prefix){
   if(!ronAmount) return '';
-  const p=prefix||'🔧 Montaj estimat:';
+  const p=prefix||t('laborBadge');
   return `<div style="display:inline-flex;align-items:center;gap:6px;background:#fff9f0;border:1.5px solid #f0a500;
     border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:#b8680a;margin-bottom:10px">
     ${p} <strong>~${ronAmount.toLocaleString('ro-RO')} RON</strong>
-    <span style="font-size:9px;font-weight:400;color:#c78a20">· poate fi adăugat la finalizare</span>
+    <span style="font-size:9px;font-weight:400;color:#c78a20">${t('laborBadgePost')}</span>
   </div>`;
 }
 function getLaborCost(){
@@ -3004,7 +3004,7 @@ function updatePackageStageSummary(){
   if(carLine) carLine.textContent=selBrand&&selModel?`${selBrand} ${selModel} ${selYear}`:'—';
   if(metaLine){
     const bi=bodyInfo[bodyClass]||{name:'—'};
-    const fuelLabel=propulsion==="ev"?"Electric":"Combustie";
+    const fuelLabel=propulsion==="ev"?t('propElectric'):t('propCombustie');
     metaLine.textContent=selBrand&&selModel?`${bi.name} · ${fuelLabel}`:'—';
   }
   if(zonesList){
@@ -3611,7 +3611,7 @@ function collapseCarForm(){
   }
   document.getElementById("blocked-msg")?.remove();
   const bi=bodyInfo[bodyClass]||{icon:"🚗",name:""};
-  const fuelLabel=propulsion==="ev"?"⚡ Electric":"🔥 Combustie";
+  const fuelLabel=propulsion==="ev"?"⚡ "+t('propElectric'):"🔥 "+t('propCombustie');
   const bodyLabel=getSelectedBodySummaryLabel();
   document.getElementById("csb-icon").textContent=bi.icon;
   document.getElementById("csb-name").textContent=`${selBrand} ${selModel} ${selYear}`;
@@ -4401,22 +4401,22 @@ function renderPartialChoice(){
   basicSubMode='full';
   const pricePart=Math.round(calcQualityPrice('basic')*0.4);
   let h=`<div style="padding:4px 0">
-    <p class="zm-subtitle">Acoperire uși față — Basic</p>
+    <p class="zm-subtitle">${t('partialTitle')}</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div onclick="basicSubMode='full';addZoneToCart()" style="border:2px solid var(--red);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;background:#fff0ee">
         <div style="font-size:22px;margin-bottom:4px">🚪</div>
-        <div style="font-size:12px;font-weight:800">Suprafață totală</div>
-        <div style="font-size:10px;color:#555;margin-top:4px;line-height:1.4">Insonorizare completă a ușii — pentru confort</div>
+        <div style="font-size:12px;font-weight:800">${t('fullDoorTitle')}</div>
+        <div style="font-size:10px;color:#555;margin-top:4px;line-height:1.4">${t('fullDoorDesc')}</div>
         <div style="font-size:14px;font-weight:800;color:var(--red);margin-top:8px">~${priceFull} RON</div>
       </div>
       <div onclick="basicSubMode='partial';addZoneToCart()" style="border:1.5px solid var(--border);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;background:#fff">
         <div style="font-size:22px;margin-bottom:4px">🎵</div>
-        <div style="font-size:12px;font-weight:800">Doar difuzor</div>
-        <div style="font-size:10px;color:#555;margin-top:4px;line-height:1.4">Antivibrații pe zona din jurul difuzorului — creează o incintă fonică pentru bass mai curat</div>
+        <div style="font-size:12px;font-weight:800">${t('speakerTitle')}</div>
+        <div style="font-size:10px;color:#555;margin-top:4px;line-height:1.4">${t('speakerDesc')}</div>
         <div style="font-size:14px;font-weight:800;color:var(--red);margin-top:8px">~${pricePart} RON</div>
       </div>
     </div>
-    <button onclick="currentLayers=null;currentQuality=null;renderStep1()" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-size:12px;cursor:pointer">← Înapoi</button>
+    <button onclick="currentLayers=null;currentQuality=null;renderStep1()" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-size:12px;cursor:pointer">${t('backBtn')}</button>
   </div>`;
   const rcP=document.getElementById('zm-col-r');
   if(rcP&&window.innerWidth>=900){
@@ -4448,8 +4448,8 @@ function addZoneToCart(skipCarCheck, forceReplace){
   const car=selBrand&&selModel?`${selBrand} ${selModel}`:"";
   const carLabel=selBrand&&selModel&&selYear?`${selBrand} ${selModel} ${selYear}`:"";
   const bi2=bodyInfo[bodyClass]||{name:"",icon:"🚗"};
-  const subLabel=isPartialApplicable()&&basicSubMode==="partial"?" (doar difuzor)":"";
-  const roofLabel=currentZone==='roof'&&roofSunroof!=='none'?(roofSunroof==='panoramic'?" (trapă panoramică)":" (trapă)"):"";
+  const subLabel=isPartialApplicable()&&basicSubMode==="partial"?t('doorsPartialSuffix'):"";
+  const roofLabel=currentZone==='roof'&&roofSunroof!=='none'?(roofSunroof==='panoramic'?t('roofPanoramicSuffix'):t('roofNormalSuffix')):"";
   const nextZoneName=zoneNames[currentZone]+subLabel+roofLabel;
   const nextQualityName=qualityDef[currentQuality].name;
   const existingItem=getActiveVehicleCartItems().find(i=>i.zone===currentZone);
@@ -4798,7 +4798,7 @@ function renderTrunkSubSelect(){
 function startTrunkSubConfig(subId){
   const sz=trunkSubZones.find(s=>s.id===subId);
   currentZone=subId;currentLayers=null;currentQuality=null;
-  document.getElementById("zm-zone-name").textContent=`Portbagaj — ${sz.name}`;
+  document.getElementById("zm-zone-name").textContent=`${t('portbagajPrefix')}${sz.name}`;
   document.getElementById("zm-back").style.visibility="visible";
   renderStep1TrunkSub(sz);
 }
@@ -4895,9 +4895,9 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
       return;
     }
     openZoneReplaceDialog(
-      `Portbagaj — ${sz.name} există deja în coș`,
-      `${existingItem.zoneName} · ${existingItem.layers} straturi · ${existingItem.quality}`,
-      `Portbagaj — ${sz.name} · ${currentLayers} straturi · ${nextQualityName}`,
+      `${t('portbagajPrefix')}${sz.name} există deja în coș`,
+      `${existingItem.zoneName} · ${existingItem.layers} ${t('straturiStr')} · ${existingItem.quality}`,
+      `${t('portbagajPrefix')}${sz.name} · ${currentLayers} ${t('straturiStr')} · ${nextQualityName}`,
       ()=>{
         cartItems=cartItems.filter(i=>!(i.zone===subId&&isItemForActiveVehicle(i)));
         addZoneToCartTrunk(skipCarCheck, true);
@@ -4906,7 +4906,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
     return;
   }
   cartItems.push({
-    zone:subId,zoneName:`Portbagaj — ${sz.name}`,layers:currentLayers,
+    zone:subId,zoneName:`${t('portbagajPrefix')}${sz.name}`,layers:currentLayers,
     quality:nextQualityName,car:`${selBrand} ${selModel}`,area,total,lines,
     id:Date.now(),carLabel,bodyClassName:bi2.name,bodyIcon:bi2.icon,
     variantLabel:getCurrentVehicleVariantLabel(),propulsion,vehicleKey:getCurrentVehicleKey()
@@ -6257,6 +6257,26 @@ function initTheme(){
 }
 
 initTheme();
+
+// Apply translations after DOM is fully loaded
+(function(){
+  function doApply(){
+    applyStaticTranslations();
+    // Update disc-bar title
+    const dbTitle=document.getElementById('disc-bar-title');
+    if(dbTitle)dbTitle.textContent=t('discBarTitle');
+    // Update propulsion labels
+    const combBtn=document.querySelector('#propulsion-btns button:first-child');
+    const elecBtn=document.querySelector('#propulsion-btns button:last-child');
+    if(combBtn&&combBtn.textContent.includes('Combustie'))combBtn.textContent=t('propCombustie');
+    if(elecBtn&&elecBtn.textContent.includes('Electric'))elecBtn.textContent=t('propElectric');
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',doApply);
+  } else {
+    doApply();
+  }
+})();
 </script>
 </body>
 </html>
