@@ -2823,21 +2823,27 @@ const EV_ONLY_MODELS={
 };
 
 // Modele care necesită demontarea tablei intermediare + macaralei de geam pentru acces tabla exterioară ușă
-// null = toate modelele brandului; array = modele specifice
+// Format: { brand: [ {model, yearFrom?, yearTo?} ] }  sau null = toate modelele brandului
 const DOOR_DISASSEMBLY_MODELS={
-  "Skoda":         ["Octavia 2"],
-  "Volkswagen":    ["Tiguan","Touareg"],
-  "Ford":          ["Fusion","Mondeo"],
+  "Škoda":         [{model:"Octavia",yearFrom:2004,yearTo:2013}], // Octavia gen 2
+  "Skoda":         [{model:"Octavia",yearFrom:2004,yearTo:2013}], // fallback fără diacritic
+  "Volkswagen":    [{model:"Tiguan"},{model:"Touareg"}],
+  "Ford":          [{model:"Fusion"},{model:"Mondeo"}],
   "Mercedes-Benz": null  // toate modelele
 };
 
 function requiresDoorDisassembly(){
-  if(!selBrand) return false;
-  if(!(selBrand in DOOR_DISASSEMBLY_MODELS)) return false;
-  const models=DOOR_DISASSEMBLY_MODELS[selBrand];
-  if(models===null) return true; // toate modelele brandului
-  if(!selModel) return false;
-  return models.some(m=>selModel.toLowerCase().includes(m.toLowerCase()));
+  if(!selBrand||!selModel) return false;
+  const entries=DOOR_DISASSEMBLY_MODELS[selBrand];
+  if(entries===undefined) return false;
+  if(entries===null) return true; // toate modelele brandului
+  const yr=parseInt(selYear)||0;
+  return entries.some(e=>{
+    if(!selModel.toLowerCase().includes(e.model.toLowerCase())) return false;
+    if(e.yearFrom&&yr&&yr<e.yearFrom) return false;
+    if(e.yearTo&&yr&&yr>e.yearTo) return false;
+    return true;
+  });
 }
 
 // Zone ascunse per tip varianta
