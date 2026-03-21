@@ -4350,7 +4350,7 @@ function selectLayer(n){
 
   // Celebration toast la max straturi
   if(n===maxL&&maxL>1){
-    setTimeout(()=>showToast(t('layerCelebration')),150);
+    setTimeout(()=>showLayerCelebrationBanner(t('layerCelebration')),150);
     if(currentZone==='roof'){renderRoofSunroofStep();return;}
     renderStep2();
     return;
@@ -6165,6 +6165,39 @@ function finalizeOrder(customer){
 function showToast(msg){
   const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+function showLayerCelebrationBanner(msg){
+  const existing=document.getElementById('layer-celebration-banner');
+  if(existing) existing.remove();
+  const banner=document.createElement('div');
+  banner.id='layer-celebration-banner';
+  banner.style.cssText=[
+    'position:fixed','bottom:0','left:0','right:0','z-index:9999',
+    'background:linear-gradient(135deg,#e74c3c,#c0392b)',
+    'color:#fff','padding:20px 24px','text-align:center',
+    'box-shadow:0 -4px 24px rgba(231,76,60,0.45)',
+    'animation:slideUpBanner .35s ease',
+    'border-radius:18px 18px 0 0'
+  ].join(';');
+  banner.innerHTML=`
+    <div style="font-size:32px;margin-bottom:6px">🏆</div>
+    <div style="font-size:16px;font-weight:900;letter-spacing:.3px;margin-bottom:4px">${msg}</div>
+    <div style="font-size:12px;opacity:.88">Acum alege calitatea materialelor pentru a finaliza zona.</div>`;
+  // Adauga animatie CSS daca nu exista
+  if(!document.getElementById('celebration-style')){
+    const s=document.createElement('style');
+    s.id='celebration-style';
+    s.textContent='@keyframes slideUpBanner{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}';
+    document.head.appendChild(s);
+  }
+  document.body.appendChild(banner);
+  setTimeout(()=>{
+    banner.style.transition='transform .4s ease,opacity .4s ease';
+    banner.style.transform='translateY(100%)';
+    banner.style.opacity='0';
+    setTimeout(()=>banner.remove(),400);
+  },3000);
 }
 
 function update3DZones(){/* 3D viewer dezactivat */}
