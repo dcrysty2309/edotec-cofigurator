@@ -7183,6 +7183,9 @@ initTheme();
     <div style="font-size:13px;color:#555;margin-bottom:16px;line-height:1.5">Ai o configurație în curs. Lasă-ne emailul și ți-o trimitem — o poți relua oricând.</div>
     <div id="exit-email-form">
       <input id="exit-email-input" type="email" placeholder="adresa@email.ro"
+        style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:8px;outline:none"
+        onfocus="this.style.borderColor='#e74c3c'" onblur="this.style.borderColor='#ddd'">
+      <input id="exit-phone-input" type="tel" placeholder="Număr telefon (opțional)"
         style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;outline:none"
         onfocus="this.style.borderColor='#e74c3c'" onblur="this.style.borderColor='#ddd'">
       <button onclick="exitSaveEmail()"
@@ -7286,10 +7289,13 @@ function exitSaveEmail(){
       document.getElementById('exit-email-form').style.display='block';
     }
   };
-  // Trimitem doar EMAIL - fara MERGE6/tags ca sa nu cauzeze rejectii
+  const phone=(document.getElementById('exit-phone-input')||{}).value||'';
+  // Trimitem EMAIL + PHONE (standard) + CAR (camp custom - trebuie creat in Mailchimp)
   const mcUrl='https://edotec.us11.list-manage.com/subscribe/post-json'
     +'?u='+_mc_u+'&id='+_mc_id+'&f_id='+_mc_fid
     +'&EMAIL='+encodeURIComponent(email)
+    +(phone?'&PHONE='+encodeURIComponent(phone):'')
+    +'&CAR='+encodeURIComponent(car)     // camp custom "CAR" - merge tag CAR in Mailchimp
     +'&b_'+_mc_u+'_'+_mc_id+'='          // honeypot gol
     +'&c='+_cbName;
   const s=document.createElement('script');
