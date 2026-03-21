@@ -2173,10 +2173,9 @@ function renderDiscountBar(){
   } else if(next){
     msgHtml=`<div class="disc-bar-next">Mai adaugă <strong>${(next.at-totalRON).toLocaleString('ro-RO')} RON</strong> → primești <strong>-${next.pct}%</strong> reducere 🎁</div>`;
   }
-  // Upgrade suggestion: Basic→Pro sau Pro→Luxury (oricare e cazul)
+  // Upgrade suggestion: Basic→Pro sau Pro→Luxury — apare oricand exista zone upgradabile
   if(next){
     const gap=next.at-totalRON;
-    const within20pct=gap<=next.at*0.20;
     // Prioritate: Basic→Pro, altfel Pro→Luxury
     const basicItems=cartItems.filter(it=>it.qualityKey==='basic');
     const proItems=cartItems.filter(it=>it.qualityKey==='pro');
@@ -2184,7 +2183,7 @@ function renderDiscountBar(){
     const toQuality=basicItems.length?'pro':'luxury';
     const toLabel=basicItems.length?'Pro':'Luxury';
     const btnColor=basicItems.length?'#e67e22':'#8e44ad';
-    if(within20pct&&upgradeItems.length){
+    if(upgradeItems.length){
       const allIds=JSON.stringify(upgradeItems.map(it=>it.id));
       const zoneList=upgradeItems.map(it=>it.zoneName||(zoneNames[it.zone]||it.zone)).join(', ');
       const fromLabel=basicItems.length?'Basic':'Pro';
@@ -2197,7 +2196,7 @@ function renderDiscountBar(){
       <div style="margin-top:5px;text-align:center">
         <button onclick="closeCart();openPro()" style="background:none;border:none;color:#888;font-size:9.5px;cursor:pointer;text-decoration:underline;padding:2px 4px;letter-spacing:0.2px">${t('discBarExtraSheets')}</button>
       </div>`;
-    } else if(!upgradeItems.length||!within20pct){
+    } else {
       // Arata doar link Foi individuale fara buton upgrade
       msgHtml+=`<div style="margin-top:4px;text-align:center">
         <button onclick="closeCart();openPro()" style="background:none;border:none;color:#888;font-size:9.5px;cursor:pointer;text-decoration:underline;padding:2px 4px;letter-spacing:0.2px">${t('discBarExtraSheets')}</button>
@@ -6988,7 +6987,7 @@ function addFullPackageToCart(quality, includeLabor){
     });
     cartItems.push({
       zone:z.zone,zoneName:z.label,layers:z.layers,
-      quality:qName,car,area,total,lines,
+      quality:qName,qualityKey:quality,car,area,total,lines,
       id:Date.now()+Math.random(),carLabel,bodyClassName:bi.name,bodyIcon:bi.icon,
       variantLabel:getCurrentVehicleVariantLabel(),propulsion,vehicleKey:getCurrentVehicleKey()
     });
