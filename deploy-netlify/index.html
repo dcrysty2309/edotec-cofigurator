@@ -2626,17 +2626,20 @@ const prodWeightKgM2={
 };
 
 function calcCartTotalWeightKg(){
-  const si=laborSizeIdx[bodyClass]||1;
   let total=0;
+  const prodByName={};
+  Object.values(prods).forEach(p=>{prodByName[p.name]=p;});
   cartItems.forEach(it=>{
     if(it.zone==='extra') return;
-    const area=it.area||getZoneReferenceArea(it.zone,si);
-    (it.layers||[]).forEach(l=>{
-      const p=prods[l.p];
-      if(!p) return;
-      const w=prodWeightKgM2[l.p]||1.5;
-      const sheets=Math.ceil(area*l.c*1.1/p.m2);
-      total+=sheets*p.m2*w;
+    (it.lines||[]).forEach(line=>{
+      if(line.startsWith('__section:')) return;
+      const m=line.match(/^(.+?) [\u00d7x] (\d+) coli/) || line.match(/^(.+?) (\d+) coli/);
+      if(!m) return;
+      const prod=prodByName[m[1].trim()];
+      if(!prod) return;
+      const qty=parseInt(m[2]);
+      const w=prodWeightKgM2[prod.id]||1.5;
+      total+=qty*prod.m2*w;
     });
   });
   return Math.round(total*10)/10;
