@@ -7290,21 +7290,39 @@ function exitSaveEmail(){
     }
   };
   const phone=(document.getElementById('exit-phone-input')||{}).value||'';
-  // Trimitem EMAIL + PHONE (standard) + CAR (camp custom - trebuie creat in Mailchimp)
-  // f_id omis intentionat — cu f_id Mailchimp accepta doar campurile din formularul lor embed
-  const mcUrl='https://edotec.us11.list-manage.com/subscribe/post-json'
-    +'?u='+_mc_u+'&id='+_mc_id
-    +'&EMAIL='+encodeURIComponent(email)
-    +(phone?'&PHONE='+encodeURIComponent(phone):'')
-    +'&CAR='+encodeURIComponent(car)     // merge tag CAR (creat in Mailchimp)
-    +'&b_'+_mc_u+'_'+_mc_id+'='          // honeypot gol
-    +'&c='+_cbName;
-  const s=document.createElement('script');
-  s.id='mc-jsonp-script';s.src=mcUrl;
-  document.body.appendChild(s);
+  // Trimitere via form POST in iframe invizibil — accepta TOATE campurile merge
+  let iframe=document.getElementById('mc-iframe');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='mc-iframe';
+    iframe.name='mc-iframe';
+    iframe.style.display='none';
+    document.body.appendChild(iframe);
+  }
+  const form=document.createElement('form');
+  form.method='POST';
+  form.action='https://edotec.us11.list-manage.com/subscribe/post';
+  form.target='mc-iframe';
+  const fields={
+    'u':'199409e1f77a23e211d094049',
+    'id':'3556f547e8',
+    'EMAIL':email,
+    'PHONE':phone,
+    'CAR':car,
+    ['b_199409e1f77a23e211d094049_3556f547e8']:''
+  };
+  Object.entries(fields).forEach(([k,v])=>{
+    const inp=document.createElement('input');
+    inp.type='hidden';inp.name=k;inp.value=v;
+    form.appendChild(inp);
+  });
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(()=>{ try{document.body.removeChild(form);}catch(e){} },3000);
+  // Arata succes imediat (POST in iframe nu are callback)
   document.getElementById('exit-email-form').style.display='none';
   document.getElementById('exit-email-sent').style.display='block';
-  // Navigheaza dupa 3 sec (daca callback-ul nu a venit)
+  document.getElementById('exit-email-sent').textContent='✅ Email salvat! Te contactăm în curând.';
   setTimeout(()=>exitLeave(),3000);
 }
 
