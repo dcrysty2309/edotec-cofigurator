@@ -1962,6 +1962,99 @@ const WHATSAPP_PHONE='';   // ex: '40740123456' (fara +)
 const CALLMEBOT_KEY='';    // cheia API CallMeBot
 
 // ════════════ SESIUNE PERSISTENTA (localStorage) ════════════
+
+// ═══════════════════════════════════════════════════════
+// CENTRAL UPSELL ENGINE — ruleaza dupa orice modificare cart
+// ═══════════════════════════════════════════════════════
+const _upsellCooldown={};
+function checkUpsellOpportunities(trigger){
+  if(!cartItems.length) return;
+  const now=Date.now();
+  // Cooldown 3s per trigger tip (evita spam)
+  if(_upsellCooldown[trigger]&&now-_upsellCooldown[trigger]<3000) return;
+  _upsellCooldown[trigger]=now;
+
+  const activeItems=getActiveVehicleCartItems().filter(it=>it.zone!=='extra');
+  if(!activeItems.length) return;
+  const totalRON=ron(activeItems.reduce((s,i)=>s+i.total,0));
+  const currentTierPct=getDiscountPctForAmount(totalRON);
+  const nextTier=DISC_TIERS.find(t=>t.pct>currentTierPct);
+
+  const basicItems=activeItems.filter(it=>it.qualityKey==='basic');
+  const proItems=activeItems.filter(it=>it.qualityKey==='pro');
+  const luxItems=activeItems.filter(it=>it.qualityKey==='luxury');
+  const evItems=activeItems.filter(it=>it.qualityKey==='ev_elite');
+
+  // Zonele existente în coș
+  const existingZones=new Set(activeItems.map(it=>it.zone));
+
+  // ── REGULA 1: Upgrade calitate când ești aproape de tier (sau oricând pentru >1 zona)
+  if(nextTier){
+    const gap=nextTier.at-totalRON;
+    const withinReach=gap<=nextTier.at*0.30; // 30% distanță
+    if(withinReach){
+      // Ofera upgrade la calitate superioara
+      if(basicItems.length){
+        _scheduleUpsellToast(`💡 Upgrade ${basicItems.length} zone la <strong>Pro</strong> → deblochezi <strong>-${nextTier.pct}%</strong> reducere — un singur click`,
+          ()=>autoUpgradeAllBasic(JSON.parse('['+basicItems.map(it=>it.id).join(',')+']'),'pro','basic'));
+        return;
+      }
+      if(proItems.length&&nextTier.pct>=7){
+        _scheduleUpsellToast(`💡 Upgrade ${proItems.length} zone la <strong>Luxury</strong> → deblochezi <strong>-${nextTier.pct}%</strong> reducere — un singur click`,
+          ()=>autoUpgradeAllBasic(JSON.parse('['+proItems.map(it=>it.id).join(',')+']'),'luxury','pro'));
+        return;
+      }
+    }
+  }
+
+  // ── REGULA 2: Mix Basic+Pro → uniformizare
+  if(basicItems.length&&proItems.length&&trigger==='add'){
+    _scheduleUpsellToast(`💡 Ai ${basicItems.length} zone la Basic și ${proItems.length} la Pro — uniformizează totul la <strong>Pro</strong> pentru o reducere mai bună`,
+      ()=>autoUpgradeAllBasic(JSON.parse('['+basicItems.map(it=>it.id).join(',')+']'),'pro','basic'));
+    return;
+  }
+
+  // ── REGULA 3: Sugestie zone complementare (depinde de ce e în coș)
+  if(trigger==='add'&&!nextTier){
+    // Deja la tier maxim - sugeram zone noi
+    const suggestions=[];
+    if(existingZones.has('doors_front')&&!existingZones.has('doors_rear')) suggestions.push({zone:'doors_rear',label:'Uși spate'});
+    if((existingZones.has('doors_front')||existingZones.has('doors_rear'))&&!existingZones.has('floor')) suggestions.push({zone:'floor',label:'Podea'});
+    if(existingZones.has('floor')&&!existingZones.has('trunk')) suggestions.push({zone:'trunk',label:'Portbagaj'});
+    if(existingZones.has('floor')&&!existingZones.has('roof')) suggestions.push({zone:'roof',label:'Plafon'});
+    if(suggestions.length){
+      const s=suggestions[0];
+      _scheduleUpsellToast(`💡 Completează izolarea — adaugă <strong>${s.label}</strong> pentru o experiență mai bună`, null);
+    }
+    return;
+  }
+
+  // ── REGULA 4: EV pitch pentru masini ICE cu cos mare (>5000 RON)
+  if(propulsion!=='ev'&&totalRON>5000&&evItems.length===0&&luxItems.length>0&&trigger==='upgrade'){
+    _scheduleUpsellToast(`⚡ Ai ales Luxury — treci la <strong>EV Electra</strong> pentru materiale 30% mai ușoare și economii la carburant`,
+      ()=>autoUpgradeAllToQuality(['luxury'],'ev_elite'));
+  }
+}
+
+let _upsellToastTimer=null;
+function _scheduleUpsellToast(msg, actionFn){
+  clearTimeout(_upsellToastTimer);
+  _upsellToastTimer=setTimeout(()=>{
+    const existing=document.getElementById('upsell-toast');
+    if(existing) existing.remove();
+    const el=document.createElement('div');
+    el.id='upsell-toast';
+    el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;background:#1a1a1a;color:#fff;border-radius:12px;padding:10px 14px;max-width:340px;width:90%;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:11px;line-height:1.5;display:flex;gap:10px;align-items:center;animation:fadeInUp .3s ease';
+    const btnHtml=actionFn?`<button onclick="document.getElementById('upsell-toast').remove();(${actionFn.toString()})()"
+      style="flex-shrink:0;padding:6px 10px;background:#e67e22;color:#fff;border:none;border-radius:7px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap">
+      Da, upgrade →
+    </button>`:'';
+    el.innerHTML=`<div style="flex:1">${msg}</div>${btnHtml}<button onclick="this.parentNode.remove()" style="flex-shrink:0;background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;padding:0 4px">×</button>`;
+    document.body.appendChild(el);
+    setTimeout(()=>{if(el.parentNode)el.remove();},8000);
+  },600);
+}
+
 const SESSION_KEY='edotec_session_v1';
 const SESSION_TTL=7*24*60*60*1000; // 7 zile
 
@@ -4868,6 +4961,7 @@ function autoUpgradeAllBasic(ids, newQuality, fromQuality){
     if(lb){lb.classList.remove('configured-basic','configured-pro','configured-luxury','configured-ev_elite');lb.classList.add(qClass);}
   });
   updateCartUI(); saveSession();
+  checkUpsellOpportunities('upgrade');
   const newTier=getDiscountPct();
   if(newTier>prevTier){
     showDiscountUnlockPopup(newTier, upgradedNames, fromQuality||newQuality==='pro'?'basic':newQuality==='luxury'?'pro':'luxury');
@@ -5057,6 +5151,7 @@ function addZoneToCart(skipCarCheck, forceReplace){
   update3DZones();
   saveSession();
   bounceCart();showToast(`✓ ${zoneNames[currentZone]||currentZone} ${t('toastAdded')}`);
+  setTimeout(()=>checkUpsellOpportunities('add'),800);
 }
 
 // ════════════ CAR CHANGE HANDLERS ════════════
