@@ -2666,6 +2666,15 @@ function calcEvWeightSaving(){
   return {saved:Math.round((currentWeight-evEquivWeight)*10)/10, totalArea};
 }
 
+function calcWeightFromProductTotals(productTotals){
+  let wKg=0;
+  Object.entries(productTotals||{}).forEach(([id,{sheets}])=>{
+    const p=prods[id];if(!p) return;
+    wKg+=sheets*p.m2*(prodWeightKgM2[id]||1.5);
+  });
+  return Math.round(wKg*10)/10;
+}
+
 // Layer descriptions — generale
 function getLayerInfo(){return[
   {n:1,label:t('l1Label'),desc:t('l1Desc'),ph:"layer-ph-1"},
@@ -4081,6 +4090,9 @@ function renderPopPkgStep2(){
       <div style="background:${sel?'rgba(255,255,255,.25)':col};border-radius:8px;padding:6px 10px;text-align:center">
         <span style="font-size:16px;font-weight:900;color:#fff">${ron(r.totalCost)} RON</span>
         <div style="font-size:9px;color:rgba(255,255,255,.8)">~${r.totalArea.toFixed(1)} m² materiale</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.75);margin-top:5px;background:rgba(0,0,0,.12);border-radius:5px;padding:3px 7px">
+        ${ (()=>{ const wKg=calcWeightFromProductTotals(r.productTotals); if(!wKg) return ''; const fs=calcFuelStats(wKg); return '📦 ~'+wKg+' kg · ⛽ +'+fs.extraL+' L/an'; })() }
+      </div>
       </div>
     </button>`;
   });
@@ -6339,6 +6351,14 @@ function showFullPackage(targetId){
           <span style="font-size:15px;font-weight:900;color:#fff">${ron(r.totalCost)} RON</span>
           <span style="font-size:9px;color:rgba(255,255,255,.85);font-weight:600">materiale</span>
         </div>
+        ${ (()=>{
+          const wKg=calcWeightFromProductTotals(r.productTotals);
+          if(!wKg) return '';
+          const fs=calcFuelStats(wKg);
+          return '<div style="font-size:9px;color:#556;margin-top:7px;padding:4px 8px;background:rgba(255,255,255,.72);border-radius:7px">'
+            +'📦 ~'+wKg+' kg mat. · ⛽ +'+fs.extraL+' L/an · ~'+fs.costRON+' RON/an'
+            +'</div>';
+        })() }
       </button>`;
   });  // sfarsit qualList.forEach
 
