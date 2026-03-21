@@ -6518,13 +6518,24 @@ function exitSaveEmail(){
   track('exit_email_captured',{email,car,value:cartValue});
   // Salveaza local
   try{localStorage.setItem('edotec_exit_lead',JSON.stringify({email,car,cartValue,zones,ts:new Date().toISOString()}));}catch(e){}
-  // Trimite la Mailchimp via proxy
-  const proxyUrl=window.location.origin+'/mailchimp-proxy.php';
-  fetch(proxyUrl,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({email,car,cart_value:cartValue,zones,source:'exit-intent'})
-  }).catch(()=>{}); // silent fail — nu blocam UX
+  // Trimite la Mailchimp via JSONP (no server needed)
+  const _mc_u='199409e1f77a23e211d094049';
+  const _mc_id='3556f547e8';
+  const _mc_fid='00851be1f0';
+  const _cbName='_mc_cb_'+Date.now();
+  window[_cbName]=function(data){
+    try{delete window[_cbName];}catch(e){}
+    const s=document.getElementById('mc-jsonp-script');if(s)s.remove();
+  };
+  const mcUrl='https://edotec.us11.list-manage.com/subscribe/post-json'
+    +'?u='+_mc_u+'&id='+_mc_id+'&f_id='+_mc_fid
+    +'&EMAIL='+encodeURIComponent(email)
+    +'&MERGE6='+encodeURIComponent(car)  // camp custom CAR daca exista
+    +'&b_'+_mc_u+'_'+_mc_id+'='          // honeypot gol
+    +'&c='+_cbName;
+  const s=document.createElement('script');
+  s.id='mc-jsonp-script';s.src=mcUrl;
+  document.body.appendChild(s);
   document.getElementById('exit-email-form').style.display='none';
   document.getElementById('exit-email-sent').style.display='block';
   setTimeout(()=>exitLeave(),2500);
