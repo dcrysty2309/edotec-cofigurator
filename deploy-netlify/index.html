@@ -1663,6 +1663,7 @@ stratLabel:"Layer",noCarLabel:"Unspecified vehicle",laborBadge:"🔧 Estimated i
 doorsPartialSuffix:" (speaker area only)",roofNormalSuffix:" (sunroof)",roofPanoramicSuffix:" (panoramic sunroof)",portbagajPrefix:"Trunk — ",maxLayersN:"{n} layers",maxLayers1:"1 layer",listenWithSound:"Listen with sound",
 pkgMaterialsAdded:"(materials) added to cart!",pkgWithLaborAdded:"+ labor added to cart!",
 weightBadge:"✅ EdoTec: {w} kg — {s} kg lighter than classic insulation materials",
+ecoBadgeIce:"🌱 EdoTec materials reduce CO₂ emissions by ~12% vs other market materials, due to lower weight",ecoBadgeIceSub:"A better choice for the environment, without performance compromises.",
 fuelBadge:"💰 Save ~{r} RON/year vs. classic materials · EdoTec EV is designed specifically for electric vehicles",
 fuelCo2:"",
 evSavingsHint:"🌿 With EV Electra, weight would be ~{w} kg less, saving ~{r} RON/year in fuel. The price difference is recovered in ~{m} months.",
@@ -1732,6 +1733,7 @@ stratLabel:"Réteg",noCarLabel:"Nem meghatározott jármű",laborBadge:"🔧 Bec
 doorsPartialSuffix:" (csak hangszóró terület)",roofNormalSuffix:" (tetőablak)",roofPanoramicSuffix:" (panoráma tetőablak)",portbagajPrefix:"Csomagtartó — ",maxLayersN:"{n} réteg",maxLayers1:"1 réteg",listenWithSound:"Hallgasson hanggal",
 pkgMaterialsAdded:"(anyagok) kosárba helyezve!",pkgWithLaborAdded:"+ munkadíj kosárba helyezve!",
 weightBadge:"✅ EdoTec: {w} kg — {s} kg könnyebb a klasszikus anyagoknál",
+ecoBadgeIce:"🌱 EdoTec anyagok ~12%-kal csökkentik a CO₂ kibocsátást a piaci alternatívákhoz képest",ecoBadgeIceSub:"Jobb választás a környezet számára, teljesítménykompromisszum nélkül.",
 fuelBadge:"⛽ {r} RON/év megtakarítás üzemanyagon más piaci anyagokhoz képest",
 fuelCo2:"💧 ~{c} kg-mal kevesebb CO₂/év vs. nehezebb piaci anyagok",
 evSavingsHint:"🌿 EV Electra esetén a tömeg ~{w} kg-mal kevesebb lenne, ~{r} RON/év üzemanyag-megtakarítással. Az árkülönbség ~{m} hónap alatt megtérül.",
@@ -1801,6 +1803,7 @@ stratLabel:"Слой",noCarLabel:"Неуточнено превозно сред
 doorsPartialSuffix:" (само зона за говорител)",roofNormalSuffix:" (люк)",roofPanoramicSuffix:" (панорамен люк)",portbagajPrefix:"Багажник — ",maxLayersN:"{n} слоя",maxLayers1:"1 слой",listenWithSound:"Слушайте със звук",
 pkgMaterialsAdded:"(материали) добавено в количката!",pkgWithLaborAdded:"+ труд добавено в количката!",
 weightBadge:"✅ EdoTec: {w} kg — {s} kg по-леки от класическите материали",
+ecoBadgeIce:"🌱 Материалите EdoTec намаляват CO₂ емисиите с ~12% в сравнение с други пазарни материали",ecoBadgeIceSub:"По-добър избор за околната среда, без компромиси в ефективността.",
 fuelBadge:"⛽ {r} RON/год икономия от гориво vs. други пазарни материали",
 fuelCo2:"💧 ~{c} kg по-малко CO₂/год vs. тежки пазарни материали",
 evSavingsHint:"🌿 С EV Electra теглото би било с ~{w} kg по-малко, спестявайки ~{r} RON/год за гориво. Ценовата разлика се изплаща за ~{m} месеца.",
@@ -5023,17 +5026,24 @@ function openCart(){
       <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border)">
         <span>${k}</span><strong>${mt[k]} coli</strong></div>`).join('');
   } else document.getElementById('cm-materials').style.display='none';
-  // Weight + fuel savings badge (vs piata)
+  // Weight/eco badge
   const wbEl=document.getElementById('cm-weight-badge');
   if(wbEl&&n>0){
-    const ms=calcMarketSavings();
-    if(ms){
-      wbEl.innerHTML=`<div style="background:#f0fff4;border:1px solid #b2dfdb;border-radius:8px;padding:8px 11px;margin-bottom:8px;font-size:10px;color:#1b5e20;line-height:1.7">
-        <div style="font-weight:800;font-size:11px;margin-bottom:2px">${t('weightBadge').replace('{w}',ms.edotecKg).replace('{s}',ms.savedKg)}</div>
-        <div>${t('fuelBadge').replace('{l}',ms.savedL).replace('{r}',ms.savedRON)}</div>
-        
+    if(propulsion==='ev'){
+      const ms=calcMarketSavings();
+      if(ms){
+        wbEl.innerHTML=`<div style="background:#f0fff4;border:1px solid #b2dfdb;border-radius:8px;padding:8px 11px;margin-bottom:8px;font-size:10px;color:#1b5e20;line-height:1.7">
+          <div style="font-weight:800;font-size:11px;margin-bottom:2px">${t('weightBadge').replace('{w}',ms.edotecKg).replace('{s}',ms.savedKg)}</div>
+          <div>${t('fuelBadge').replace('{l}',ms.savedL).replace('{r}',ms.savedRON)}</div>
+        </div>`;
+      } else { wbEl.innerHTML=''; }
+    } else {
+      // ICE: mesaj generic de mediu
+      wbEl.innerHTML=`<div style="background:#f1f8e9;border:1px solid #c5e1a5;border-radius:8px;padding:8px 11px;margin-bottom:8px;font-size:10px;color:#33691e;line-height:1.6">
+        <div style="font-weight:800;font-size:11px;margin-bottom:2px">${t('ecoBadgeIce')}</div>
+        <div style="opacity:.85">${t('ecoBadgeIceSub')}</div>
       </div>`;
-    } else { wbEl.innerHTML=''; }
+    }
   } else if(wbEl){ wbEl.innerHTML=''; }
   document.getElementById("cart-modal-bg").classList.add("show");
 }
@@ -5336,25 +5346,20 @@ function renderCheckoutStep1(){
       </div>
     </div>
     ${(()=>{
-      const ms=calcMarketSavings();
-      if(!ms) return '';
-      let html=`<div style="background:#f0fff4;border:1.5px solid #b2dfdb;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;line-height:1.7;color:#1b5e20">
-        <div style="font-weight:800;margin-bottom:4px;font-size:12px">${t('weightBadge').replace('{w}',ms.edotecKg).replace('{s}',ms.savedKg)}</div>
-        <div>${t('fuelBadge').replace('{l}',ms.savedL).replace('{r}',ms.savedRON)}</div>
-        '`; 
-      if(propulsion!=='ev'){
-        const ev=calcEvWeightSaving();
-        if(ev.saved>0){
-          const evFs=calcFuelStats(ev.saved);
-          const evPrice=ms.edotecKg>0?Math.round(getDiscountedMaterialsRON()*0.3):0;
-          const monthsToRecover=evFs.costRON>0?Math.round(evPrice/evFs.costRON*12):0;
-          html+=`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #c8d8f8;color:#1a5c35">
-            ${t('evSavingsHint').replace('{w}',ev.saved).replace('{r}',evFs.costRON).replace('{m}',monthsToRecover)}
-          </div>`;
-        }
+      if(propulsion==='ev'){
+        const ms=calcMarketSavings();
+        if(!ms) return '';
+        let html=`<div style="background:#f0fff4;border:1.5px solid #b2dfdb;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;line-height:1.7;color:#1b5e20">
+          <div style="font-weight:800;margin-bottom:4px;font-size:12px">${t('weightBadge').replace('{w}',ms.edotecKg).replace('{s}',ms.savedKg)}</div>
+          <div>${t('fuelBadge').replace('{l}',ms.savedL).replace('{r}',ms.savedRON)}</div>
+        </div>`;
+        return html;
+      } else {
+        return `<div style="background:#f1f8e9;border:1.5px solid #c5e1a5;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;line-height:1.7;color:#33691e">
+          <div style="font-weight:800;margin-bottom:4px;font-size:12px">${t('ecoBadgeIce')}</div>
+          <div style="opacity:.85">${t('ecoBadgeIceSub')}</div>
+        </div>`;
       }
-      html+='</div>';
-      return html;
     })()}
     <div style="font-size:13px;font-weight:700;margin-bottom:10px">${t('chkNeedInstall')}</div>
     <div class="montaj-card" onclick="showMontajYes()">
