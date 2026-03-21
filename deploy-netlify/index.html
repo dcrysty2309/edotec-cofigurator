@@ -6438,6 +6438,109 @@ ${_withMontaj&&customer.city?`<div class="section">
   <button onclick="window.print()" style="padding:12px 24px;background:#e74c3c;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Salvează ca PDF</button>
   <button onclick="window.close()" style="padding:12px 24px;background:#333;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer">✕ Închide</button>
 </div>
+
+<!-- Exit Intent Popup -->
+<div id="exit-popup-bg" style="display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box">
+  <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+    <div style="font-size:48px;margin-bottom:8px">⚠️</div>
+    <div style="font-size:20px;font-weight:900;color:#1a1a1a;margin-bottom:6px">Ești sigur că vrei să pleci?</div>
+    <div style="font-size:13px;color:#555;margin-bottom:16px;line-height:1.5">Ai o configurație în curs. Lasă-ne emailul și ți-o trimitem — o poți relua oricând.</div>
+    <div id="exit-email-form">
+      <input id="exit-email-input" type="email" placeholder="adresa@email.ro"
+        style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;outline:none"
+        onfocus="this.style.borderColor='#e74c3c'" onblur="this.style.borderColor='#ddd'">
+      <button onclick="exitSaveEmail()"
+        style="width:100%;padding:13px;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:10px">
+        📧 Salvează configurația și pleacă
+      </button>
+    </div>
+    <div id="exit-email-sent" style="display:none;padding:10px;background:#f0fff4;border-radius:8px;color:#27ae60;font-weight:700;margin-bottom:10px">
+      ✅ Configrația a fost salvată! Verifică emailul.
+    </div>
+    <button onclick="exitStay()"
+      style="width:100%;padding:12px;background:#27ae60;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px">
+      ← Rămân pe pagină
+    </button>
+    <button onclick="exitLeave()"
+      style="width:100%;padding:10px;background:#f5f5f5;color:#888;border:none;border-radius:10px;font-size:12px;cursor:pointer">
+      Pleacă fără a salva
+    </button>
+  </div>
+</div>
+<script>
+// ════════════ EXIT INTENT — Back button intercept ════════════
+let _exitPopupShown=false;
+let _allowExit=false;
+
+function initExitIntent(){
+  // Injecteaza un state fals ca sa putem prinde back
+  history.pushState({configurator:true},'','');
+  window.addEventListener('popstate',function(e){
+    if(_allowExit) return;
+    // Re-push state sa nu se piarda
+    history.pushState({configurator:true},'','');
+    if(cartItems.length>0&&!_exitPopupShown){
+      showExitPopup();
+    }
+  });
+
+  // Mouse exit intent pe desktop (cursorul iese din fereastra sus)
+  document.addEventListener('mouseleave',function(e){
+    if(e.clientY<=0&&cartItems.length>0&&!_exitPopupShown){
+      showExitPopup();
+    }
+  });
+}
+
+function showExitPopup(){
+  _exitPopupShown=true;
+  const el=document.getElementById('exit-popup-bg');
+  if(el){el.style.display='flex';}
+  track('exit_intent',{car:`${selBrand} ${selModel}`,items:cartItems.length,value:cartItems.reduce((s,i)=>s+i.total,0)});
+}
+
+function exitStay(){
+  document.getElementById('exit-popup-bg').style.display='none';
+  _exitPopupShown=false;
+  track('exit_intent_stay',{});
+}
+
+function exitLeave(){
+  _allowExit=true;
+  document.getElementById('exit-popup-bg').style.display='none';
+  track('exit_intent_leave',{});
+  history.back();
+}
+
+function exitSaveEmail(){
+  const email=document.getElementById('exit-email-input').value.trim();
+  if(!email||!email.includes('@')){
+    document.getElementById('exit-email-input').style.borderColor='#e74c3c';
+    document.getElementById('exit-email-input').focus();
+    return;
+  }
+  // Salveaza configuratia compacta
+  const config={
+    email,
+    car:`${selBrand} ${selModel} ${selYear}`,
+    propulsion,
+    total:ron(cartItems.reduce((s,i)=>s+i.total,0)),
+    zones:cartItems.filter(it=>it.zone!=='extra').map(it=>`${it.zoneName} ${it.quality} ${it.layers}str`).join(', '),
+    ts:new Date().toISOString()
+  };
+  // Track in GA4 cu email
+  track('exit_email_captured',{email,car:config.car,value:config.total});
+  // Salveaza in localStorage pentru recuperare
+  try{localStorage.setItem('edotec_exit_lead',JSON.stringify(config));}catch(e){}
+  // Trimite pe email via mailto (fallback simplu)
+  document.getElementById('exit-email-form').style.display='none';
+  document.getElementById('exit-email-sent').style.display='block';
+  setTimeout(()=>exitLeave(),2500);
+}
+
+// Init dupa load
+window.addEventListener('load',()=>setTimeout(initExitIntent,1000));
+</script>
 </body></html>`;
 
   try{
