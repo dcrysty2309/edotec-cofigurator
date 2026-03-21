@@ -7278,7 +7278,8 @@ function exitSaveEmail(){
   const mcUrl='https://edotec.us11.list-manage.com/subscribe/post-json'
     +'?u='+_mc_u+'&id='+_mc_id+'&f_id='+_mc_fid
     +'&EMAIL='+encodeURIComponent(email)
-    +'&MERGE6='+encodeURIComponent(car)  // camp custom CAR daca exista
+    +'&MERGE6='+encodeURIComponent(car)  // camp custom CAR
+    +'&tags='+encodeURIComponent('configurator insonorizant')  // tag audienta
     +'&b_'+_mc_u+'_'+_mc_id+'='          // honeypot gol
     +'&c='+_cbName;
   const s=document.createElement('script');
