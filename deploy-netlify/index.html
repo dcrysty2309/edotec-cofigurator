@@ -6511,20 +6511,20 @@ function exitSaveEmail(){
     document.getElementById('exit-email-input').focus();
     return;
   }
-  // Salveaza configuratia compacta
-  const config={
-    email,
-    car:`${selBrand} ${selModel} ${selYear}`,
-    propulsion,
-    total:ron(cartItems.reduce((s,i)=>s+i.total,0)),
-    zones:cartItems.filter(it=>it.zone!=='extra').map(it=>`${it.zoneName} ${it.quality} ${it.layers}str`).join(', '),
-    ts:new Date().toISOString()
-  };
-  // Track in GA4 cu email
-  track('exit_email_captured',{email,car:config.car,value:config.total});
-  // Salveaza in localStorage pentru recuperare
-  try{localStorage.setItem('edotec_exit_lead',JSON.stringify(config));}catch(e){}
-  // Trimite pe email via mailto (fallback simplu)
+  const car=`${selBrand} ${selModel} ${selYear}`;
+  const cartValue=ron(cartItems.reduce((s,i)=>s+i.total,0))+' RON';
+  const zones=cartItems.filter(it=>it.zone!=='extra').map(it=>`${it.zoneName} ${it.quality}`).join(', ');
+  // Track GA4
+  track('exit_email_captured',{email,car,value:cartValue});
+  // Salveaza local
+  try{localStorage.setItem('edotec_exit_lead',JSON.stringify({email,car,cartValue,zones,ts:new Date().toISOString()}));}catch(e){}
+  // Trimite la Mailchimp via proxy
+  const proxyUrl=window.location.origin+'/mailchimp-proxy.php';
+  fetch(proxyUrl,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email,car,cart_value:cartValue,zones,source:'exit-intent'})
+  }).catch(()=>{}); // silent fail — nu blocam UX
   document.getElementById('exit-email-form').style.display='none';
   document.getElementById('exit-email-sent').style.display='block';
   setTimeout(()=>exitLeave(),2500);
