@@ -7274,12 +7274,22 @@ function exitSaveEmail(){
   window[_cbName]=function(data){
     try{delete window[_cbName];}catch(e){}
     const s=document.getElementById('mc-jsonp-script');if(s)s.remove();
+    const sentEl=document.getElementById('exit-email-sent');
+    if(data&&data.result==='success'){
+      if(sentEl) sentEl.textContent='✅ Email salvat! Îți trimitem configurația în curând.';
+    } else {
+      // Afiseaza eroarea reala din Mailchimp (pt debugging)
+      const msg=(data&&data.msg)?data.msg:'Eroare la trimitere. Încearcă din nou.';
+      if(sentEl) sentEl.style.background='#fff0f0';
+      if(sentEl) sentEl.style.color='#c0392b';
+      if(sentEl) sentEl.textContent='⚠️ '+msg.replace(/<[^>]*>/g,'').substring(0,120);
+      document.getElementById('exit-email-form').style.display='block';
+    }
   };
+  // Trimitem doar EMAIL - fara MERGE6/tags ca sa nu cauzeze rejectii
   const mcUrl='https://edotec.us11.list-manage.com/subscribe/post-json'
     +'?u='+_mc_u+'&id='+_mc_id+'&f_id='+_mc_fid
     +'&EMAIL='+encodeURIComponent(email)
-    +'&MERGE6='+encodeURIComponent(car)  // camp custom CAR
-    +'&tags='+encodeURIComponent('configurator-insonorizat')  // tag audienta
     +'&b_'+_mc_u+'_'+_mc_id+'='          // honeypot gol
     +'&c='+_cbName;
   const s=document.createElement('script');
@@ -7287,7 +7297,8 @@ function exitSaveEmail(){
   document.body.appendChild(s);
   document.getElementById('exit-email-form').style.display='none';
   document.getElementById('exit-email-sent').style.display='block';
-  setTimeout(()=>exitLeave(),2500);
+  // Navigheaza dupa 3 sec (daca callback-ul nu a venit)
+  setTimeout(()=>exitLeave(),3000);
 }
 
 // Init dupa load
