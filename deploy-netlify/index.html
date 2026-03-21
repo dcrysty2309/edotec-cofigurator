@@ -2081,13 +2081,16 @@ function renderDiscountBar(){
     const gap=next.at-totalRON;
     const within20pct=gap<=next.at*0.20;
     if(within20pct){
-      const basicItem=cartItems.find(it=>it.quality&&(it.quality.toLowerCase().includes('basic')||it.quality.toLowerCase().includes('de bază')||it.quality.toLowerCase().includes('alap')||it.quality.toLowerCase().includes('начал')));
-      const zoneName=basicItem?( basicItem.zoneName||zoneNames[basicItem.zone]||basicItem.zone):'';
+      const basicItems=cartItems.filter(it=>it.quality&&(it.quality.toLowerCase().includes('basic')||it.quality.toLowerCase().includes('de bază')||it.quality.toLowerCase().includes('alap')||it.quality.toLowerCase().includes('начал')));
+      const basicItem=basicItems[0];
       if(basicItem){
-        msgHtml+=`<button onclick="autoUpgradeCartItem(${basicItem.id},'pro')"
+        const allIds=JSON.stringify(basicItems.map(it=>it.id));
+        const zoneList=basicItems.map(it=>it.zoneName||(zoneNames[it.zone]||it.zone)).join(', ');
+        msgHtml+=`<button onclick="autoUpgradeAllBasic(${allIds},'pro')"
           style="display:block;width:100%;margin-top:5px;padding:9px 10px;background:#fff8e1;border:1.5px solid #f0c030;border-radius:8px;cursor:pointer;text-align:left;font-size:10px;color:#555">
-          ${t('cartUpgradeHint').replace('{z}',zoneName).replace('{pct}',next.pct)}
-          <span style="display:block;margin-top:4px;background:#e67e22;color:#fff;border-radius:6px;padding:4px 8px;font-weight:800;font-size:11px;text-align:center">⚡ Upgrade automat la Pro →</span>
+          <div style="margin-bottom:3px">Upgradează <strong>${basicItems.length} zone</strong> la Pro → deblochez <strong>-${next.pct}%</strong> reducere</div>
+          <div style="font-size:9px;color:#888;margin-bottom:5px">${zoneList}</div>
+          <span style="display:block;background:#e67e22;color:#fff;border-radius:6px;padding:4px 8px;font-weight:800;font-size:11px;text-align:center">⚡ Upgrade toate la Pro — un singur click →</span>
         </button>
         <div style="margin-top:5px;text-align:center">
           <button onclick="closeCart();openPro()" style="background:none;border:none;color:#888;font-size:9.5px;cursor:pointer;text-decoration:underline;padding:2px 4px;letter-spacing:0.2px">${t('discBarExtraSheets')}</button>
@@ -4763,6 +4766,46 @@ function getEffectiveArea(){
 
 let _pendingZoneAdd=false;
 
+// Upgradeaza TOATE zonele Basic la newQuality dintr-un singur click
+function autoUpgradeAllBasic(ids, newQuality){
+  const prevTier=getDiscountPct();
+  const upgradedNames=[];
+  ids.forEach(id=>{
+    const item=cartItems.find(it=>it.id===id);
+    if(!item) return;
+    const savedZone=currentZone,savedLayers=currentLayers,savedQ=currentQuality,savedMode=basicSubMode;
+    currentZone=item.zone; currentLayers=item.layers; currentQuality=newQuality; basicSubMode='full';
+    const area=item.area||getArea();
+    const layers=getQualityLayers(newQuality);
+    let total=0; const lines=[];
+    layers.forEach(l=>{
+      const p=prods[l.p]; const sheets=Math.ceil(area*l.c*1.1/p.m2);
+      const cost=sheets*p.price[propulsion]; total+=cost;
+      lines.push(`${p.name} \u00d7 ${sheets} coli \u2014 ${ron(cost)} RON`);
+    });
+    currentZone=savedZone; currentLayers=savedLayers; currentQuality=savedQ; basicSubMode=savedMode;
+    const newQualityName=qualityDef[newQuality]?qualityDef[newQuality].name:newQuality;
+    const idx=cartItems.findIndex(it=>it.id===id);
+    if(idx>=0){
+      cartItems[idx]={...item, quality:newQualityName, total, lines, id:Date.now()+idx};
+      upgradedNames.push(item.zoneName||(zoneNames[item.zone]||item.zone));
+    }
+    const qClass=`configured-${newQuality}`;
+    const zp=document.getElementById(`zpin-${item.zone}`);
+    if(zp){zp.classList.remove('configured-basic','configured-pro','configured-luxury','configured-ev_elite');zp.classList.add(qClass);}
+    const lb=document.querySelector(`.lbtn[data-zone="${item.zone}"]`);
+    if(lb){lb.classList.remove('configured-basic','configured-pro','configured-luxury','configured-ev_elite');lb.classList.add(qClass);}
+  });
+  updateCartUI(); saveSession();
+  const newTier=getDiscountPct();
+  if(newTier>prevTier){
+    showDiscountUnlockPopup(newTier, upgradedNames);
+  } else {
+    openCart();
+    showToast(`\u2705 ${upgradedNames.length} zone upgradrate la Pro`);
+  }
+}
+
 // Auto-upgrade item in cart to new quality, fara pasi manuali
 function autoUpgradeCartItem(itemId, newQuality){
   const item=cartItems.find(it=>it.id===itemId);
@@ -4811,7 +4854,7 @@ function autoUpgradeCartItem(itemId, newQuality){
   }
 }
 
-function showDiscountUnlockPopup(pct){
+function showDiscountUnlockPopup(pct, upgradedNames){
   const existing=document.getElementById('discount-unlock-popup');
   if(existing) existing.remove();
   const popup=document.createElement('div');
@@ -4825,10 +4868,15 @@ function showDiscountUnlockPopup(pct){
     style="margin-top:8px;width:100%;padding:11px;background:#e67e22;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
     Vezi insonorizare completă →
   </button>`:'';
+  const zonesSummary=upgradedNames&&upgradedNames.length?
+    `<div style="margin:8px 0;padding:8px 10px;background:#f0fff4;border-radius:8px;font-size:11px;color:#1b5e20;text-align:left">
+      <strong>Zone upgradrate la Pro:</strong><br>${upgradedNames.join('<br>')}
+    </div>`:'';
   popup.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.18)">
     <div style="font-size:48px;margin-bottom:8px">🎉</div>
     <div style="font-size:22px;font-weight:900;color:#27ae60;margin-bottom:6px">Ai deblocat -${pct}% reducere!</div>
-    <div style="font-size:13px;color:#555;line-height:1.5">Upgrade-ul de calitate a activat o reducere mai mare pe toată comanda ta.</div>
+    ${zonesSummary}
+    <div style="font-size:13px;color:#555;line-height:1.5">Toate zonele Basic au fost upgradrate automat la Pro.</div>
     ${nextHint}
     <button onclick="document.getElementById('discount-unlock-popup').remove();openCart()"
       style="margin-top:10px;width:100%;padding:11px;background:#f0f0f0;color:#333;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
