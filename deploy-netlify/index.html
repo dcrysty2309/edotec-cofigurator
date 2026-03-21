@@ -7291,11 +7291,12 @@ function exitSaveEmail(){
   };
   const phone=(document.getElementById('exit-phone-input')||{}).value||'';
   // Trimitem EMAIL + PHONE (standard) + CAR (camp custom - trebuie creat in Mailchimp)
+  // f_id omis intentionat — cu f_id Mailchimp accepta doar campurile din formularul lor embed
   const mcUrl='https://edotec.us11.list-manage.com/subscribe/post-json'
-    +'?u='+_mc_u+'&id='+_mc_id+'&f_id='+_mc_fid
+    +'?u='+_mc_u+'&id='+_mc_id
     +'&EMAIL='+encodeURIComponent(email)
     +(phone?'&PHONE='+encodeURIComponent(phone):'')
-    +'&CAR='+encodeURIComponent(car)     // camp custom "CAR" - merge tag CAR in Mailchimp
+    +'&CAR='+encodeURIComponent(car)     // merge tag CAR (creat in Mailchimp)
     +'&b_'+_mc_u+'_'+_mc_id+'='          // honeypot gol
     +'&c='+_cbName;
   const s=document.createElement('script');
