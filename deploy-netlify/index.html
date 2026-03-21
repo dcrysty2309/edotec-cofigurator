@@ -1007,6 +1007,7 @@ body.desktop-flow .desktop-step.is-info .desktop-step-nr{background:#eaded1;colo
   gtag('config','G-4ZKTLMNY2F',{page_title:'Configurator Insonorizare EdoTec',send_page_view:true});
   // Helper central tracking
   function track(event, params){try{gtag('event',event,params||{});}catch(e){}}
+  function trackEvent(action,params){track(action,params);}  // backward compat
 </script>
 </head>
 <body class="desktop-flow step-1">
