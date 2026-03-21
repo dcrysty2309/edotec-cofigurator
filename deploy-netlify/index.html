@@ -7213,9 +7213,11 @@ function initExitIntent(){
   history.pushState({configurator:true},'','');
   window.addEventListener('popstate',function(e){
     if(_allowExit) return;
-    // Re-push state sa nu se piarda
+    // Daca coșul e gol, lasam navigarea libera
+    if(cartItems.length===0){ _allowExit=true; return; }
+    // Re-push state sa blocam navigarea si aratam popupul
     history.pushState({configurator:true},'','');
-    if(cartItems.length>0&&!_exitPopupShown){
+    if(!_exitPopupShown){
       showExitPopup();
     }
   });
