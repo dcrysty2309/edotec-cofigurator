@@ -1598,14 +1598,14 @@ fuelCo2:"💨 CO₂ estimat suplimentar: ~{c} kg/an",
 evSavingsHint:"🌿 Cu EV Electra, greutatea ar fi cu ~{w} kg mai mică, economisind ~{r} RON/an în carburant. Diferența de preț se recuperează în ~{m} luni.",
 evSavingsModalBadge:"⛽ Cu materialele EV economisești ~{w} kg față de pachetul standard → Mai puțin {l} L/an · Economie ~{r} RON/an",
 layerCelebration:"🎉 Cea mai bună alegere! Ai selectat pachetul maxim de straturi pentru această zonă!",
-layerNudgeMax:"💪 Alegere bună! Există și varianta cu {n} straturi — maximul pentru această zonă.",
+layerNudgeMax:"💪 Alegere bună! Există și varianta cu {n} straturi — maximul pentru această zonă. Fiecare strat în plus reduce semnificativ zgomotul transmis.",
 layerNudgeMaxLink:"Treci la {n} straturi",
-layerNudgeMore:"✅ Opțiune solidă! Poți adăuga până la {n} straturi în plus pentru izolare mai bună.",
+layerNudgeMore:"✅ Opțiune solidă! Totuși, cu {n} straturi mai mult obții o reducere a zgomotului cu până la 40% mai eficientă.",
 layerNudgeMoreLink:"Upgrade la {n} straturi",
-layerNudgeBase:"⚡ Strat de bază — excelent contra vibrațiilor tablei. Recomandăm cel puțin 2 straturi pentru un rezultat mai complet.",
+layerNudgeBase:"⚡ Strat de bază — atacă vibrațiile tablei. Cu 2+ straturi adaugi și izolare fonică și termică — diferența se simte imediat.",
 layerNudgeBaseLink:"Upgrade la 2 straturi",
 layerStay:"Rămân la {n} straturi",
-layerNudgePopupSub:"Varianta cu {n} straturi oferă izolarea completă pentru această zonă.",
+layerNudgePopupSub:"Cu {n} straturi obții izolarea maximă: antivibrații + izolare fonică + absorbție sonoră. Fiecare strat atacă un alt tip de zgomot.",
 cartUpgradeHint:"💡 Upgrade la calitate Pro sau Luxury pentru zona {z} și ajungi la reducerea de {pct}%",
 discBarExtraSheets:"sau adaugă foi de material individual →",
 },
@@ -1667,14 +1667,14 @@ fuelCo2:"💨 Estimated extra CO₂: ~{c} kg/year",
 evSavingsHint:"🌿 With EV Electra, weight would be ~{w} kg less, saving ~{r} RON/year in fuel. The price difference is recovered in ~{m} months.",
 evSavingsModalBadge:"⛽ EV materials save ~{w} kg vs standard package → {l} L/year less · ~{r} RON/year savings",
 layerCelebration:"🎉 Best choice! You selected the maximum layer package for this zone!",
-layerNudgeMax:"💪 Good choice! There's also a {n}-layer option — the maximum for this zone.",
+layerNudgeMax:"💪 Good choice! There's also a {n}-layer option — the maximum for this zone. Each extra layer significantly reduces transmitted noise.",
 layerNudgeMaxLink:"Switch to {n} layers",
-layerNudgeMore:"✅ Solid option! You can add up to {n} more layers for better insulation.",
+layerNudgeMore:"✅ Solid option! With {n} more layers you get up to 40% more effective noise reduction.",
 layerNudgeMoreLink:"Upgrade to {n} layers",
-layerNudgeBase:"⚡ Base layer — excellent against sheet metal vibrations. We recommend at least 2 layers for a more complete result.",
+layerNudgeBase:"⚡ Base layer — tackles sheet metal vibrations. With 2+ layers you also add acoustic and thermal insulation — the difference is immediate.",
 layerNudgeBaseLink:"Upgrade to 2 layers",
 layerStay:"Stay with {n} layers",
-layerNudgePopupSub:"The {n}-layer version offers complete insulation for this zone.",
+layerNudgePopupSub:"With {n} layers you get maximum insulation: anti-vibration + acoustic + sound absorption. Each layer targets a different type of noise.",
 cartUpgradeHint:"💡 Upgrade to Pro or Luxury quality for zone {z} and reach the {pct}% discount",
 discBarExtraSheets:"or add individual material sheets →",
 },
@@ -3857,7 +3857,7 @@ function showPromo(){
   video.currentTime=0;
   video.play().catch(()=>{});
   if(_promoTimer) clearTimeout(_promoTimer);
-  _promoTimer=setTimeout(()=>closePromo(), 4000);
+  _promoTimer=setTimeout(()=>closePromo(), 2500);
 }
 
 function closePromo(){
