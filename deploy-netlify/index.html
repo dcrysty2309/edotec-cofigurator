@@ -4141,14 +4141,17 @@ function renderPopPkgStep2(){
       <div style="font-size:9px;color:rgba(255,255,255,.75);margin-top:5px;background:rgba(0,0,0,.12);border-radius:5px;padding:3px 7px">
         ${ (()=>{
           const wKg=calcWeightFromProductTotals(r.productTotals); if(!wKg) return '';
-          const mKg=calcMarketWeightFromProductTotals(r.productTotals);
-          const savedKg=Math.round((mKg-wKg)*10)/10;
-          const savedL=calcFuelStats(Math.max(savedKg,0.1)).extraL;
-          const pctLighter=mKg>0?Math.round(savedKg/mKg*100):0;
-          return '<div style="font-size:9px;color:#444;margin-top:6px;padding:4px 7px;background:rgba(255,255,255,.75);border-radius:6px;line-height:1.5">'
-            +'📦 '+wKg+' kg vs ~'+mKg+' kg alte materiale (-'+pctLighter+'%)<br>'
-            +'🌿 -'+savedL+' L/an consum carburant'
-            +'</div>';
+          if(q==='ev_elite'){
+            const mKg=calcMarketWeightFromProductTotals(r.productTotals);
+            const savedKg=Math.round((mKg-wKg)*10)/10;
+            const savedL=calcFuelStats(Math.max(savedKg,0.1)).extraL;
+            const pctLighter=mKg>0?Math.round(savedKg/mKg*100):30;
+            return '📦 '+wKg+' kg vs ~'+mKg+' kg alte mat. EV (-'+pctLighter+'%) · 🌿 -'+savedL+' L/an';
+          } else {
+            const savedKg12=Math.round(wKg*0.12*10)/10;
+            const savedL=calcFuelStats(Math.max(savedKg12,0.1)).extraL;
+            return '📦 '+wKg+' kg · ~12% mai ușor față de alte materiale · 🌿 -'+savedL+' L/an';
+          }
         })() }
       </div>
       </div>
@@ -6622,14 +6625,25 @@ function showFullPackage(targetId){
         ${ (()=>{
           const wKg=calcWeightFromProductTotals(r.productTotals);
           if(!wKg) return '';
-          const mKg=calcMarketWeightFromProductTotals(r.productTotals);
-          const savedKg=Math.round((mKg-wKg)*10)/10;
-          const savedL=calcFuelStats(Math.max(savedKg,0.1)).extraL;
-          const pctLighter=mKg>0?Math.round(savedKg/mKg*100):0;
-          return '<div style="font-size:9px;color:#333;margin-top:7px;padding:4px 8px;background:rgba(255,255,255,.75);border-radius:7px;line-height:1.5">'
-            +'📦 '+wKg+' kg vs ~'+mKg+' kg alte mat. (-'+pctLighter+'%)<br>'
-            +'🌿 -'+savedL+' L/an consum carburant'
-            +'</div>';
+          if(q==='ev_elite'){
+            // EV: comparatie reala cu materiale EV din piata (ref 0.85 kg/m²) → ~30%
+            const mKg=calcMarketWeightFromProductTotals(r.productTotals);
+            const savedKg=Math.round((mKg-wKg)*10)/10;
+            const savedL=calcFuelStats(Math.max(savedKg,0.1)).extraL;
+            const pctLighter=mKg>0?Math.round(savedKg/mKg*100):30;
+            return '<div style="font-size:9px;color:#00474f;margin-top:7px;padding:4px 8px;background:rgba(255,255,255,.75);border-radius:7px;line-height:1.5">'
+              +'📦 '+wKg+' kg vs ~'+mKg+' kg alte mat. EV (-'+pctLighter+'%)<br>'
+              +'🌿 -'+savedL+' L/an consum carburant'
+              +'</div>';
+          } else {
+            // ICE: diferenta fixa ~12% (VibroMax = acelasi kg/m² ca bitumul → economia vine din straturi mai usoare)
+            const savedKg12=Math.round(wKg*0.12*10)/10;
+            const savedL=calcFuelStats(Math.max(savedKg12,0.1)).extraL;
+            return '<div style="font-size:9px;color:#333;margin-top:7px;padding:4px 8px;background:rgba(255,255,255,.75);border-radius:7px;line-height:1.5">'
+              +'📦 '+wKg+' kg (EdoTec) · ~12% mai ușor față de alte materiale<br>'
+              +'🌿 -'+savedL+' L/an consum carburant'
+              +'</div>';
+          }
         })() }
       </button>`;
   });  // sfarsit qualList.forEach
