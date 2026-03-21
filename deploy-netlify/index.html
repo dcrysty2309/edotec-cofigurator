@@ -2076,30 +2076,35 @@ function renderDiscountBar(){
   } else if(next){
     msgHtml=`<div class="disc-bar-next">Mai adaugă <strong>${(next.at-totalRON).toLocaleString('ro-RO')} RON</strong> → primești <strong>-${next.pct}%</strong> reducere 🎁</div>`;
   }
-  // Upgrade suggestion: show when within 20% of next tier and there are basic-quality items
+  // Upgrade suggestion: Basic→Pro sau Pro→Luxury (oricare e cazul)
   if(next){
     const gap=next.at-totalRON;
     const within20pct=gap<=next.at*0.20;
-    if(within20pct){
-      const basicItems=cartItems.filter(it=>it.quality&&(it.quality.toLowerCase().includes('basic')||it.quality.toLowerCase().includes('de bază')||it.quality.toLowerCase().includes('alap')||it.quality.toLowerCase().includes('начал')));
-      const basicItem=basicItems[0];
-      if(basicItem){
-        const allIds=JSON.stringify(basicItems.map(it=>it.id));
-        const zoneList=basicItems.map(it=>it.zoneName||(zoneNames[it.zone]||it.zone)).join(', ');
-        msgHtml+=`<button onclick="autoUpgradeAllBasic(${allIds},'pro')"
-          style="display:block;width:100%;margin-top:5px;padding:9px 10px;background:#fff8e1;border:1.5px solid #f0c030;border-radius:8px;cursor:pointer;text-align:left;font-size:10px;color:#555">
-          <div style="margin-bottom:3px">Upgradează <strong>${basicItems.length} zone</strong> la Pro → deblochez <strong>-${next.pct}%</strong> reducere</div>
-          <div style="font-size:9px;color:#888;margin-bottom:5px">${zoneList}</div>
-          <span style="display:block;background:#e67e22;color:#fff;border-radius:6px;padding:4px 8px;font-weight:800;font-size:11px;text-align:center">⚡ Upgrade toate la Pro — un singur click →</span>
-        </button>
-        <div style="margin-top:5px;text-align:center">
-          <button onclick="closeCart();openPro()" style="background:none;border:none;color:#888;font-size:9.5px;cursor:pointer;text-decoration:underline;padding:2px 4px;letter-spacing:0.2px">${t('discBarExtraSheets')}</button>
-        </div>`;
-      } else {
-        msgHtml+=`<div style="margin-top:4px;text-align:center">
-          <button onclick="closeCart();openPro()" style="background:none;border:none;color:#888;font-size:9.5px;cursor:pointer;text-decoration:underline;padding:2px 4px;letter-spacing:0.2px">${t('discBarExtraSheets')}</button>
-        </div>`;
-      }
+    // Prioritate: Basic→Pro, altfel Pro→Luxury
+    const basicItems=cartItems.filter(it=>it.qualityKey==='basic');
+    const proItems=cartItems.filter(it=>it.qualityKey==='pro');
+    const upgradeItems=basicItems.length?basicItems:proItems;
+    const toQuality=basicItems.length?'pro':'luxury';
+    const toLabel=basicItems.length?'Pro':'Luxury';
+    const btnColor=basicItems.length?'#e67e22':'#8e44ad';
+    if(within20pct&&upgradeItems.length){
+      const allIds=JSON.stringify(upgradeItems.map(it=>it.id));
+      const zoneList=upgradeItems.map(it=>it.zoneName||(zoneNames[it.zone]||it.zone)).join(', ');
+      const fromLabel=basicItems.length?'Basic':'Pro';
+      msgHtml+=`<button onclick="autoUpgradeAllBasic(${allIds},'${toQuality}','${basicItems.length?'basic':'pro'}')"
+        style="display:block;width:100%;margin-top:5px;padding:9px 10px;background:#fff8e1;border:1.5px solid #f0c030;border-radius:8px;cursor:pointer;text-align:left;font-size:10px;color:#555">
+        <div style="margin-bottom:3px">Upgradează <strong>${upgradeItems.length} zone</strong> din ${fromLabel} la ${toLabel} → deblochez <strong>-${next.pct}%</strong> reducere</div>
+        <div style="font-size:9px;color:#888;margin-bottom:5px">${zoneList}</div>
+        <span style="display:block;background:${btnColor};color:#fff;border-radius:6px;padding:4px 8px;font-weight:800;font-size:11px;text-align:center">⚡ Upgrade la ${toLabel} — un singur click →</span>
+      </button>
+      <div style="margin-top:5px;text-align:center">
+        <button onclick="closeCart();openPro()" style="background:none;border:none;color:#888;font-size:9.5px;cursor:pointer;text-decoration:underline;padding:2px 4px;letter-spacing:0.2px">${t('discBarExtraSheets')}</button>
+      </div>`;
+    } else if(!upgradeItems.length||!within20pct){
+      // Arata doar link Foi individuale fara buton upgrade
+      msgHtml+=`<div style="margin-top:4px;text-align:center">
+        <button onclick="closeCart();openPro()" style="background:none;border:none;color:#888;font-size:9.5px;cursor:pointer;text-decoration:underline;padding:2px 4px;letter-spacing:0.2px">${t('discBarExtraSheets')}</button>
+      </div>`;
     }
   }
   const markers=DISC_TIERS.map(t=>{
