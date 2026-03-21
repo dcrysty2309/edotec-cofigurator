@@ -4767,7 +4767,7 @@ function getEffectiveArea(){
 let _pendingZoneAdd=false;
 
 // Upgradeaza TOATE zonele Basic la newQuality dintr-un singur click
-function autoUpgradeAllBasic(ids, newQuality){
+function autoUpgradeAllBasic(ids, newQuality, fromQuality){
   const prevTier=getDiscountPct();
   const upgradedNames=[];
   ids.forEach(id=>{
@@ -4799,10 +4799,10 @@ function autoUpgradeAllBasic(ids, newQuality){
   updateCartUI(); saveSession();
   const newTier=getDiscountPct();
   if(newTier>prevTier){
-    showDiscountUnlockPopup(newTier, upgradedNames);
+    showDiscountUnlockPopup(newTier, upgradedNames, fromQuality||newQuality==='pro'?'basic':newQuality==='luxury'?'pro':'luxury');
   } else {
     openCart();
-    showToast(`\u2705 ${upgradedNames.length} zone upgradrate la Pro`);
+    showToast(`\u2705 ${upgradedNames.length} zone upgradrate`);
   }
 }
 
@@ -4854,30 +4854,76 @@ function autoUpgradeCartItem(itemId, newQuality){
   }
 }
 
-function showDiscountUnlockPopup(pct, upgradedNames){
+// Upgradeaza toate zonele de la fromQ la toQ
+function autoUpgradeAllToQuality(fromQualityKeywords, toQuality){
+  const targets=cartItems.filter(it=>it.quality&&fromQualityKeywords.some(kw=>it.quality.toLowerCase().includes(kw)));
+  if(!targets.length){showToast('Nicio zonă eligibilă pentru upgrade.');return;}
+  const ids=targets.map(it=>it.id);
+  autoUpgradeAllBasic(ids, toQuality);
+}
+
+function showDiscountUnlockPopup(pct, upgradedNames, fromQuality){
   const existing=document.getElementById('discount-unlock-popup');
   if(existing) existing.remove();
   const popup=document.createElement('div');
   popup.id='discount-unlock-popup';
-  popup.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px';
+  popup.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
+
+  // Gaseste urmatorul tier de reducere
   const nextTier=DISC_TIERS.find(t=>t.pct>pct);
-  const nextHint=nextTier?`<div style="margin-top:12px;font-size:12px;color:#555">
-    Vrei <strong>-${nextTier.pct}%</strong>? Adaugă insonorizarea completă a mașinii \u2192
-  </div>
-  <button onclick="document.getElementById('discount-unlock-popup').remove();openCart();setTimeout(()=>showFullPackage(),200)"
-    style="margin-top:8px;width:100%;padding:11px;background:#e67e22;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
-    Vezi insonorizare completă →
-  </button>`:'';
+
+  // Buton urmator pas de upgrade
+  let nextStepHtml='';
+  const proItems=cartItems.filter(it=>it.quality&&(it.quality.toLowerCase().includes('pro')||it.quality.toLowerCase().includes('luxury')));
+
+  if(fromQuality==='basic'&&pct<10){
+    // Am trecut la Pro → oferta Luxury
+    const proOnlyItems=cartItems.filter(it=>it.quality&&(it.quality.toLowerCase().includes('pro')&&!it.quality.toLowerCase().includes('luxury')));
+    if(proOnlyItems.length){
+      const luxIds=JSON.stringify(proOnlyItems.map(it=>it.id));
+      nextStepHtml=`
+        <div style="margin-top:14px;padding:12px;background:#f8f0ff;border:1.5px solid #9c27b0;border-radius:10px">
+          <div style="font-size:12px;font-weight:800;color:#6a1b9a;margin-bottom:4px">🏆 Vrei -10% reducere?</div>
+          <div style="font-size:11px;color:#555;margin-bottom:8px">Treci toate zonele la <strong>Luxury</strong> — un singur click și obții cea mai mare reducere disponibilă.</div>
+          <button onclick="document.getElementById('discount-unlock-popup').remove();autoUpgradeAllBasic(${luxIds},'luxury')"
+            style="width:100%;padding:11px;background:#8e44ad;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
+            ⭐ Upgrade la Luxury → obțin -10% →
+          </button>
+        </div>`;
+    }
+  } else if(fromQuality==='pro'&&pct>=10&&propulsion!=='ev'){
+    // Am trecut la Luxury → oferta EV Electra
+    const wKg=calcCartTotalWeightKg();
+    const evSaving=wKg>0?Math.round(calcFuelStats(wKg*0.3).costRON):0;
+    nextStepHtml=`
+      <div style="margin-top:14px;padding:12px;background:#e0f2f1;border:1.5px solid #00897b;border-radius:10px">
+        <div style="font-size:12px;font-weight:800;color:#00695c;margin-bottom:4px">⚡ Vrei și mai mult?</div>
+        <div style="font-size:11px;color:#555;margin-bottom:8px">Treci la <strong>EV Electra</strong> — materiale ultra-ușoare, de 4× mai ușoare decât materialele clasice.<br>Economie estimată: <strong>~${evSaving} RON/an</strong> la carburant pe termen lung.</div>
+        <button onclick="document.getElementById('discount-unlock-popup').remove();autoUpgradeAllToQuality(['luxury'],'ev_elite')"
+          style="width:100%;padding:11px;background:#00897b;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
+          ⚡ Upgrade la EV Electra →
+        </button>
+      </div>`;
+  } else if(nextTier){
+    nextStepHtml=`
+      <div style="margin-top:12px;font-size:12px;color:#555">Vrei <strong>-${nextTier.pct}%</strong>? Adaugă mai multe zone.</div>
+      <button onclick="document.getElementById('discount-unlock-popup').remove();openCart();setTimeout(()=>showFullPackage(),200)"
+        style="margin-top:8px;width:100%;padding:11px;background:#e67e22;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
+        Vezi insonorizare completă →
+      </button>`;
+  }
+
+  const toQLabel=fromQuality==='basic'?'Pro':fromQuality==='pro'?'Luxury':'EV Electra';
   const zonesSummary=upgradedNames&&upgradedNames.length?
     `<div style="margin:8px 0;padding:8px 10px;background:#f0fff4;border-radius:8px;font-size:11px;color:#1b5e20;text-align:left">
-      <strong>Zone upgradrate la Pro:</strong><br>${upgradedNames.join('<br>')}
+      <strong>Zone upgradrate la ${toQLabel}:</strong><br>${upgradedNames.join('<br>')}
     </div>`:'';
-  popup.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.18)">
-    <div style="font-size:48px;margin-bottom:8px">🎉</div>
-    <div style="font-size:22px;font-weight:900;color:#27ae60;margin-bottom:6px">Ai deblocat -${pct}% reducere!</div>
+
+  popup.innerHTML=`<div style="background:#fff;border-radius:18px;padding:24px 20px;max-width:360px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto">
+    <div style="font-size:44px;margin-bottom:6px">🎉</div>
+    <div style="font-size:21px;font-weight:900;color:#27ae60;margin-bottom:4px">Ai deblocat -${pct}% reducere!</div>
     ${zonesSummary}
-    <div style="font-size:13px;color:#555;line-height:1.5">Toate zonele Basic au fost upgradrate automat la Pro.</div>
-    ${nextHint}
+    ${nextStepHtml}
     <button onclick="document.getElementById('discount-unlock-popup').remove();openCart()"
       style="margin-top:10px;width:100%;padding:11px;background:#f0f0f0;color:#333;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
       Înapoi la coș
