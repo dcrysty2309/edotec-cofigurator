@@ -6622,9 +6622,13 @@ function showFullPackage(targetId){
         ${ (()=>{
           const wKg=calcWeightFromProductTotals(r.productTotals);
           if(!wKg) return '';
-          const fs=calcFuelStats(wKg);
-          return '<div style="font-size:9px;color:#556;margin-top:7px;padding:4px 8px;background:rgba(255,255,255,.72);border-radius:7px">'
-            +'📦 ~'+wKg+' kg mat. · ⛽ +'+fs.extraL+' L/an · ~'+fs.costRON+' RON/an'
+          const mKg=calcMarketWeightFromProductTotals(r.productTotals);
+          const savedKg=Math.round((mKg-wKg)*10)/10;
+          const savedL=calcFuelStats(Math.max(savedKg,0.1)).extraL;
+          const pctLighter=mKg>0?Math.round(savedKg/mKg*100):0;
+          return '<div style="font-size:9px;color:#333;margin-top:7px;padding:4px 8px;background:rgba(255,255,255,.75);border-radius:7px;line-height:1.5">'
+            +'📦 '+wKg+' kg vs ~'+mKg+' kg alte mat. (-'+pctLighter+'%)<br>'
+            +'🌿 -'+savedL+' L/an consum carburant'
             +'</div>';
         })() }
       </button>`;
@@ -6730,6 +6734,30 @@ function selectPkgQuality(q){
     btn.style.cursor='pointer';
     btn.style.boxShadow=`0 4px 14px ${c}55`;
     btn.textContent=t('fpAddCart');
+  }
+  // Banner EV Blue — afiseaza sub carduri cand se selecteaza ev_elite
+  let evBannerEl=document.getElementById('pkg-ev-blue-banner');
+  if(!evBannerEl){
+    evBannerEl=document.createElement('div');
+    evBannerEl.id='pkg-ev-blue-banner';
+    evBannerEl.style.marginBottom='12px';
+    if(btn) btn.parentNode.insertBefore(evBannerEl,btn);
+  }
+  if(q==='ev_elite'){
+    if(evBlueUpgrade){
+      evBannerEl.innerHTML=`<div style="background:#e0f2f1;border:1.5px solid #00897b;border-radius:10px;padding:10px 13px;display:flex;gap:10px;align-items:center;justify-content:space-between">
+        <div style="font-size:11px;color:#00474f;font-weight:700">⚡ ${t('evBlueUpgradeActive')}</div>
+        <button onclick="evBlueUpgrade=false;selectPkgQuality('ev_elite')" style="padding:5px 10px;border:1.5px solid #00897b;border-radius:7px;background:#fff;color:#00695c;font-size:11px;font-weight:700;cursor:pointer">${t('evBlueUpgradeUndo')}</button>
+      </div>`;
+    } else {
+      evBannerEl.innerHTML=`<div style="background:#e8f5e9;border:1.5px solid #43a047;border-radius:10px;padding:10px 13px">
+        <div style="font-size:12px;font-weight:800;color:#1b5e20;margin-bottom:4px">${t('evBlueUpgradeTitle')}</div>
+        <div style="font-size:11px;color:#2e7d32;line-height:1.5;margin-bottom:7px">${t('evBlueUpgradeDesc')}</div>
+        <button onclick="evBlueUpgrade=true;selectPkgQuality('ev_elite')" style="padding:7px 14px;background:#2e7d32;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">${t('evBlueUpgradeBtn')}</button>
+      </div>`;
+    }
+  } else {
+    evBannerEl.innerHTML='';
   }
 }
 
