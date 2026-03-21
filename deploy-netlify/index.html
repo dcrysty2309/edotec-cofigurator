@@ -1005,6 +1005,16 @@ body.desktop-flow .desktop-step.is-info .desktop-step-nr{background:#eaded1;colo
 .btype-pulse{animation:bodyTypePulse 1.2s ease-in-out 3;}
 @keyframes fadeInUp{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 </style>
+<!-- Google Analytics 4 — EdoTec Configurator -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4ZKTLMNY2F"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-4ZKTLMNY2F',{page_title:'Configurator Insonorizare EdoTec',send_page_view:true});
+  // Helper central tracking
+  function track(event, params){try{gtag('event',event,params||{});}catch(e){}}
+</script>
 </head>
 <body class="desktop-flow step-1">
 
@@ -4291,6 +4301,7 @@ function selectPopPkgQ(q){
 }
 
 function addPopPkgToCart(forceReplace){
+  if(!forceReplace) track('popular_package_selected',{package:window._popPkgSel,quality:window._popPkgQ,car:`${selBrand} ${selModel}`,propulsion});
   const pkg=POPULAR_PKGS.find(p=>p.id===window._popPkgSel);
   const q=window._popPkgQ;
   if(!pkg||!q) return;
@@ -4985,6 +4996,7 @@ function autoUpgradeAllBasic(ids, newQuality, fromQuality){
   });
   updateCartUI(); saveSession();
   checkUpsellOpportunities('upgrade');
+  track('upgrade_accepted',{from_quality:fromQuality||'basic',to_quality:newQuality,zones_count:ids.length,car:`${selBrand} ${selModel}`});
   const newTier=getDiscountPct();
   if(newTier>prevTier){
     showDiscountUnlockPopup(newTier, upgradedNames, fromQuality||newQuality==='pro'?'basic':newQuality==='luxury'?'pro':'luxury');
@@ -5174,6 +5186,7 @@ function addZoneToCart(skipCarCheck, forceReplace){
   update3DZones();
   saveSession();
   bounceCart();showToast(`✓ ${zoneNames[currentZone]||currentZone} ${t('toastAdded')}`);
+  track('zone_added',{zone:currentZone,quality:currentQuality,layers:currentLayers,car:`${selBrand} ${selModel}`,value:cartItems.reduce((s,i)=>s+i.total,0)});
   setTimeout(()=>checkUpsellOpportunities('add'),800);
 }
 
@@ -5312,6 +5325,7 @@ function closeCartDrawer(){
   document.getElementById('drawer-overlay').classList.remove('show');
 }
 function openCart(){
+  track('cart_opened',{items:cartItems.length,value:cartItems.reduce((s,i)=>s+i.total,0)});
   const n=cartItems.length;
   const total=cartItems.reduce((s,i)=>s+i.total,0);
   let h="";
@@ -5636,12 +5650,14 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
 
 // ════════════ CHECKOUT ════════════
 function openCheckout(){
+  track('checkout_started',{car:`${selBrand} ${selModel} ${selYear}`,propulsion,value:cartItems.reduce((s,i)=>s+i.total,0),items:cartItems.length});
   if(!cartItems.length){showToast(t('toastEmptyCart'));return;}
   trackEvent('checkout_open',{items:cartItems.length,car:`${selBrand||''} ${selModel||''}`.trim()});
   document.getElementById("checkout-content").innerHTML=renderCheckoutStep1();
   document.getElementById("checkout-bg").classList.add("show");
 }
 function submitFinalOrder(){
+  track('purchase',{transaction_id:Date.now().toString(),car:`${selBrand} ${selModel} ${selYear}`,propulsion,value:cartItems.reduce((s,i)=>s+i.total,0),currency:'RON',items:cartItems.length});
   // Adauga payment si delivery la datele clientului si finalizeaza
   if(!window._paymentMethod){showToast('Selectează metoda de plată!');return;}
   if(!window._deliveryMethod){showToast('Selectează metoda de livrare!');return;}
@@ -5665,6 +5681,7 @@ function closeCheckout(e){
 }
 
 function renderCheckoutStep1(){
+  track('checkout_started',{car:`${selBrand} ${selModel} ${selYear}`,propulsion,value:cartItems.reduce((s,i)=>s+i.total,0),items:cartItems.length});
   const total=ron(cartItems.reduce((s,i)=>s+i.total,0));
   const matTotals={};
   cartItems.forEach(it=>{
@@ -6926,6 +6943,7 @@ function togglePkgLabor(q){
 }
 
 function confirmFullPackage(){
+  track('full_package_selected',{quality:window._pkgSelQ,car:`${selBrand} ${selModel}`,propulsion});
   if(!window._pkgSelQ)return;
   finalAddPkg();
 }
