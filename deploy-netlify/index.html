@@ -4087,7 +4087,7 @@ function calcPopPkgQuality(pkg, quality){
     const layers=getQualityLayers(quality);
     layers.forEach(l=>{
       const p=prods[l.p];
-      const sheets=Math.ceil(area*l.c/p.m2);
+      const sheets=Math.ceil(area*l.c*1.05/p.m2);
       totalCost+=sheets*p.price[propulsion];
     });
     totalArea+=area;
@@ -4330,7 +4330,7 @@ function addPopPkgToCart(forceReplace){
     const lines=[];
     lyrs.forEach(l=>{
       const p=prods[l.p];
-      const sheets=Math.ceil(area*l.c/p.m2);
+      const sheets=Math.ceil(area*l.c*1.05/p.m2);
       const lineCost=sheets*p.price[propulsion];
       cost+=lineCost;
       lines.push(`${p.name} × ${sheets} coli — ${ron(lineCost)} RON`);
@@ -4738,7 +4738,7 @@ function calcQualityPrice(q){
   const area=(q==="basic"&&isDoorZone()&&basicSubMode==="partial")?getArea()*0.40:getArea();
   let total=0;
   getQualityLayers(q).forEach(l=>{
-    const p=prods[l.p];const sheets=Math.ceil(area*l.c/p.m2);
+    const p=prods[l.p];const sheets=Math.ceil(area*l.c*1.05/p.m2);
     total+=sheets*p.price[propulsion];
   });
   return ron(total);
@@ -4890,7 +4890,7 @@ function renderMatPreview(){
   let h=`<div class="mat-preview"><div class="mat-preview-title">${t('matIncluded')}</div>`;
   layers.forEach((l,idx)=>{
     const p=prods[l.p];
-    const sheets=Math.ceil(area*l.c/p.m2);
+    const sheets=Math.ceil(area*l.c*1.05/p.m2);
     const cost=sheets*p.price[propulsion];
     h+=`<div class="mat-row">
       <div>
@@ -4971,7 +4971,7 @@ function autoUpgradeAllBasic(ids, newQuality, fromQuality){
     const layers=getQualityLayers(newQuality);
     let total=0; const lines=[];
     layers.forEach(l=>{
-      const p=prods[l.p]; const sheets=Math.ceil(area*l.c/p.m2);
+      const p=prods[l.p]; const sheets=Math.ceil(area*l.c*1.05/p.m2);
       const cost=sheets*p.price[propulsion]; total+=cost;
       lines.push(`${p.name} \u00d7 ${sheets} coli \u2014 ${ron(cost)} RON`);
     });
@@ -5016,7 +5016,7 @@ function autoUpgradeCartItem(itemId, newQuality){
   const layers=getQualityLayers(newQuality);
   let total=0; const lines=[];
   layers.forEach(l=>{
-    const p=prods[l.p]; const sheets=Math.ceil(area*l.c/p.m2);
+    const p=prods[l.p]; const sheets=Math.ceil(area*l.c*1.05/p.m2);
     const cost=sheets*p.price[propulsion]; total+=cost;
     lines.push(`${p.name} \u00d7 ${sheets} coli \u2014 ${ron(cost)} RON`);
   });
@@ -5132,7 +5132,7 @@ function addZoneToCart(skipCarCheck, forceReplace){
   const layers=getQualityLayers(currentQuality);
   let total=0;const lines=[];
   layers.forEach(l=>{
-    const p=prods[l.p];const sheets=Math.ceil(area*l.c/p.m2);
+    const p=prods[l.p];const sheets=Math.ceil(area*l.c*1.05/p.m2);
     const cost=sheets*p.price[propulsion];total+=cost;
     lines.push(`${p.name} × ${sheets} coli — ${ron(cost)} RON`);
   });
@@ -5578,7 +5578,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
     const floorLayers=qualityTrunkFloor[currentQuality].layers[currentLayers]||[];
     lines.push('__section:'+t('sectionFloor')+'__');
     floorLayers.forEach(l=>{
-      const p=prods[l.p]; const sheets=Math.ceil(floorArea*l.c/p.m2);
+      const p=prods[l.p]; const sheets=Math.ceil(floorArea*l.c*1.05/p.m2);
       const cost=sheets*p.price[propulsion]; total+=cost;
       lines.push(`${p.name} × ${sheets} coli — ${ron(cost)} RON`);
     });
@@ -5587,7 +5587,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
     const sidesLayers=qualityTrunkSides[currentQuality].layers;
     lines.push('__section:'+t('sectionSides')+'__');
     sidesLayers.forEach(l=>{
-      const p=prods[l.p]; const sheets=Math.ceil(sidesArea*l.c/p.m2);
+      const p=prods[l.p]; const sheets=Math.ceil(sidesArea*l.c*1.05/p.m2);
       const cost=sheets*p.price[propulsion]; total+=cost;
       lines.push(`${p.name} × ${sheets} coli — ${ron(cost)} RON`);
     });
@@ -5596,7 +5596,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
     area=(trunkSubAreas[subId]?trunkSubAreas[subId][idx]:1.0)||1.0;
     const layers=getQualityLayers(currentQuality);
     layers.forEach(l=>{
-      const p=prods[l.p]; const sheets=Math.ceil(area*l.c/p.m2);
+      const p=prods[l.p]; const sheets=Math.ceil(area*l.c*1.05/p.m2);
       const cost=sheets*p.price[propulsion]; total+=cost;
       lines.push(`${p.name} × ${sheets} coli — ${ron(cost)} RON`);
     });
@@ -6667,7 +6667,7 @@ function calcPkgQuality(quality, layersOverride){
     const recipe=(src&&src.layers[layers])||[];
     recipe.forEach(l=>{
       const p=prods[l.p];if(!p)return;
-      const sheets=Math.ceil(area*l.c/p.m2);
+      const sheets=Math.ceil(area*l.c*1.05/p.m2);
       const cost=sheets*p.price[propulsion];
       totalCost+=cost; // EUR - ron() aplicat la afisare
       if(!productTotals[l.p])productTotals[l.p]={name:p.name,sheets:0,cost:0};
@@ -6993,7 +6993,7 @@ function addFullPackageToCart(quality, includeLabor){
     let total=0;const lines=[];
     recipe.forEach(l=>{
       const p=prods[l.p];if(!p)return;
-      const sheets=Math.ceil(area*l.c/p.m2);
+      const sheets=Math.ceil(area*l.c*1.05/p.m2);
       const cost=sheets*p.price[propulsion];
       total+=cost; // EUR - ron() aplicat la afisare
       lines.push(`${p.name} × ${sheets} coli — ${ron(cost)} RON`);
