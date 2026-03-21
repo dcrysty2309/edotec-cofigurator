@@ -4,15 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Configurator Insonorizare Auto | EdoTec</title>
-  <!-- Google Analytics 4 — inlocuieste G-XXXXXXXXXX cu Measurement ID-ul real -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer=window.dataLayer||[];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js',new Date());
-    gtag('config','G-XXXXXXXXXX',{send_page_view:true});
-    function trackEvent(action,params){if(typeof gtag!=='undefined')gtag('event',action,params||{});}
-  </script>
+  <!-- GA4 se incarca mai jos cu ID-ul real -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--red:#d63031;--dark:#1a1a2e;--gray:#f7f8fa;--border:#e4e6ea;--text:#1a1a1a;--muted:#909399;
@@ -6440,7 +6432,7 @@ ${_withMontaj&&customer.city?`<div class="section">
 </div>
 
 <!-- Exit Intent Popup -->
-<div id="exit-popup-bg" style="display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box">
+<div id="exit-popup-bg" style="display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px;box-sizing:border-box;pointer-events:none">
   <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25)">
     <div style="font-size:48px;margin-bottom:8px">⚠️</div>
     <div style="font-size:20px;font-weight:900;color:#1a1a1a;margin-bottom:6px">Ești sigur că vrei să pleci?</div>
@@ -6495,19 +6487,19 @@ function initExitIntent(){
 function showExitPopup(){
   _exitPopupShown=true;
   const el=document.getElementById('exit-popup-bg');
-  if(el){el.style.display='flex';}
+  if(el){el.style.display='flex';el.style.pointerEvents='all';}
   track('exit_intent',{car:`${selBrand} ${selModel}`,items:cartItems.length,value:cartItems.reduce((s,i)=>s+i.total,0)});
 }
 
 function exitStay(){
-  document.getElementById('exit-popup-bg').style.display='none';
+  const _ep=document.getElementById('exit-popup-bg');if(_ep){_ep.style.display='none';_ep.style.pointerEvents='none';}
   _exitPopupShown=false;
   track('exit_intent_stay',{});
 }
 
 function exitLeave(){
   _allowExit=true;
-  document.getElementById('exit-popup-bg').style.display='none';
+  const _ep=document.getElementById('exit-popup-bg');if(_ep){_ep.style.display='none';_ep.style.pointerEvents='none';}
   track('exit_intent_leave',{});
   history.back();
 }
