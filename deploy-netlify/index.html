@@ -2679,7 +2679,11 @@ function calcMarketSavings(){
       if(!prod) return;
       
       
-      marketKg+=parseInt(m[2])*prod.m2*2.4; // materiale clasice piata
+      // EV materiale: comparatie cu alte materiale EV din piata (~0.85 kg/m² → ~30% diferenta)
+      // ICE materiale: comparatie cu bitum clasic 2.4 kg/m²
+      const isEvProduct=['ev_silver','ev_blue','ev_integra','ev_vbb'].includes(prod.id);
+      const marketRef=isEvProduct?0.85:2.4;
+      marketKg+=parseInt(m[2])*prod.m2*marketRef;
     });
   });
   marketKg=Math.round(marketKg*10)/10;
@@ -4216,11 +4220,53 @@ function addPopPkgToCart(forceReplace){
   });
   currentZone=savedZone; currentLayers=savedLayers; currentQuality=savedQ;
   configModeChoice='manual';
+  // Seteaza qualityKey pe itemele adaugate (pentru upgrade chain)
+  cartItems.forEach(it=>{ if(!it.qualityKey&&it.quality===qName) it.qualityKey=q; });
   updateCartUI();
   updateConfigModeUI();
   saveSession();
   closePopPkg();
-  setTimeout(()=>openCart(),300);
+  // Verifica daca upgrade ul deblocheaza un tier de discount
+  const discPct=getDiscountPct();
+  const prevTotal=cartItems.filter(it=>!eligibleZones.some(z=>z.zone===it.zone)).reduce((s,i)=>s+i.total,0);
+  const prevPct=getDiscountPctForAmount(ron(prevTotal));
+  if(discPct>prevPct){
+    setTimeout(()=>showDiscountUnlockPopup(discPct,[`${pkg.icon} ${pkg.label} · ${qName}`],q),400);
+  } else if(q==='basic'){
+    // Ofera upgrade la Pro ca sugestie rapida
+    setTimeout(()=>{
+      const basicIds=JSON.stringify(cartItems.filter(it=>it.qualityKey==='basic'&&eligibleZones.some(z=>z.zone===it.zone)).map(it=>it.id));
+      const nextT=DISC_TIERS.find(t=>ron(cartItems.reduce((s,i)=>s+i.total,0))<t.at);
+      if(nextT) showPopPkgUpgradeSuggestion(basicIds,nextT.pct);
+      else openCart();
+    },300);
+  } else {
+    setTimeout(()=>openCart(),300);
+  }
+}
+
+function getDiscountPctForAmount(amt){
+  if(amt>=10000) return 10; if(amt>=7500) return 7; if(amt>=3500) return 5; if(amt>=1500) return 3; return 0;
+}
+
+function showPopPkgUpgradeSuggestion(basicIds, nextPct){
+  const popup=document.createElement('div');
+  popup.id='pop-pkg-upgrade-suggest';
+  popup.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
+  popup.innerHTML=`<div style="background:#fff;border-radius:16px;padding:24px 20px;max-width:340px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.18)">
+    <div style="font-size:36px;margin-bottom:8px">💡</div>
+    <div style="font-size:17px;font-weight:900;margin-bottom:8px">Vrei -${nextPct}% reducere?</div>
+    <div style="font-size:12px;color:#555;margin-bottom:14px;line-height:1.5">Upgradează pachetul selectat la <strong>Pro</strong> și ajungi la urmatorul nivel de reducere — un singur click.</div>
+    <button onclick="document.getElementById('pop-pkg-upgrade-suggest').remove();autoUpgradeAllBasic(${basicIds},'pro')"
+      style="width:100%;padding:12px;background:#27ae60;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px">
+      ⚡ Upgrade la Pro → obțin -${nextPct}% →
+    </button>
+    <button onclick="document.getElementById('pop-pkg-upgrade-suggest').remove();openCart()"
+      style="width:100%;padding:10px;background:#f0f0f0;color:#333;border:none;border-radius:10px;font-size:12px;cursor:pointer">
+      Rămân cu Basic
+    </button>
+  </div>`;
+  document.body.appendChild(popup);
 }
 
 function closePopPkg(e){
