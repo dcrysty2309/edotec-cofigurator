@@ -1594,8 +1594,8 @@ stratLabel:"Strat",noCarLabel:"Mașină nespecificată",laborBadge:"🔧 Montaj 
 doorsPartialSuffix:" (doar difuzor)",roofNormalSuffix:" (trapă)",roofPanoramicSuffix:" (trapă panoramică)",portbagajPrefix:"Portbagaj — ",maxLayersN:"{n} straturi",maxLayers1:"1 strat",listenWithSound:"Ascultă cu sunet",
 pkgMaterialsAdded:"(materiale) adăugat în coș!",pkgWithLaborAdded:"+ manoperă adăugate în coș!",
 weightBadge:"✅ EdoTec: {w} kg — cu {s} kg mai puțin față de alte materiale din piață",
-fuelBadge:"⛽ Economiești {r} RON/an la carburant față de alte materiale din piață",
-fuelCo2:"🌱 +{c} kg CO₂/an mai puțin în atmosferă față de alte materiale",
+fuelBadge:"💰 Economiești ~{r} RON/an la carburant față de alte materiale din piață",
+fuelCo2:"",
 evSavingsHint:"🌿 Cu EV Electra, greutatea ar fi cu ~{w} kg mai mică, economisind ~{r} RON/an în carburant. Diferența de preț se recuperează în ~{m} luni.",
 evSavingsModalBadge:"⛽ Cu materialele EV economisești ~{w} kg față de pachetul standard → Mai puțin {l} L/an · Economie ~{r} RON/an",
 layerCelebration:"🎉 Cea mai bună alegere! Ai selectat pachetul maxim de straturi pentru această zonă!",
@@ -1663,8 +1663,8 @@ stratLabel:"Layer",noCarLabel:"Unspecified vehicle",laborBadge:"🔧 Estimated i
 doorsPartialSuffix:" (speaker area only)",roofNormalSuffix:" (sunroof)",roofPanoramicSuffix:" (panoramic sunroof)",portbagajPrefix:"Trunk — ",maxLayersN:"{n} layers",maxLayers1:"1 layer",listenWithSound:"Listen with sound",
 pkgMaterialsAdded:"(materials) added to cart!",pkgWithLaborAdded:"+ labor added to cart!",
 weightBadge:"✅ EdoTec: {w} kg — {s} kg less than other market materials",
-fuelBadge:"⛽ Save {r} RON/year on fuel vs. other market materials",
-fuelCo2:"🌱 +{c} kg less CO₂/year vs. other market materials",
+fuelBadge:"💰 Save ~{r} RON/year on fuel vs. other market materials",
+fuelCo2:"",
 evSavingsHint:"🌿 With EV Electra, weight would be ~{w} kg less, saving ~{r} RON/year in fuel. The price difference is recovered in ~{m} months.",
 evSavingsModalBadge:"⛽ EV materials save ~{w} kg vs standard package → {l} L/year less · ~{r} RON/year savings",
 layerCelebration:"🎉 Best choice! You selected the maximum layer package for this zone!",
@@ -2669,7 +2669,9 @@ function calcMarketSavings(){
       if(!m) return;
       const prod=prodByName[m[1].trim()];
       if(!prod) return;
-      marketKg+=parseInt(m[2])*prod.m2*2.4;
+      // EV cars: compare against EV-grade market materials (1.2 kg/m²); ICE: standard bitumen (2.4 kg/m²)
+      const marketRef=propulsion==='ev'?1.2:2.4;
+      marketKg+=parseInt(m[2])*prod.m2*marketRef;
     });
   });
   marketKg=Math.round(marketKg*10)/10;
