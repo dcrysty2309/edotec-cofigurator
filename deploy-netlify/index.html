@@ -4787,7 +4787,7 @@ function autoUpgradeAllBasic(ids, newQuality, fromQuality){
     const newQualityName=qualityDef[newQuality]?qualityDef[newQuality].name:newQuality;
     const idx=cartItems.findIndex(it=>it.id===id);
     if(idx>=0){
-      cartItems[idx]={...item, quality:newQualityName, total, lines, id:Date.now()+idx};
+      cartItems[idx]={...item, quality:newQualityName, qualityKey:newQuality, total, lines, id:Date.now()+idx};
       upgradedNames.push(item.zoneName||(zoneNames[item.zone]||item.zone));
     }
     const qClass=`configured-${newQuality}`;
@@ -4833,7 +4833,7 @@ function autoUpgradeCartItem(itemId, newQuality){
   // Inlocuieste in cos
   const newQualityName=qualityDef[newQuality]?qualityDef[newQuality].name:newQuality;
   const idx=cartItems.findIndex(it=>it.id===itemId);
-  if(idx>=0) cartItems[idx]={...item, quality:newQualityName, total, lines, id:Date.now()};
+  if(idx>=0) cartItems[idx]={...item, quality:newQualityName, qualityKey:newQuality, total, lines, id:Date.now()};
 
   // Actualizeaza pin pe harta
   const qClass=`configured-${newQuality}`;
@@ -4855,11 +4855,11 @@ function autoUpgradeCartItem(itemId, newQuality){
 }
 
 // Upgradeaza toate zonele de la fromQ la toQ
-function autoUpgradeAllToQuality(fromQualityKeywords, toQuality){
-  const targets=cartItems.filter(it=>it.quality&&fromQualityKeywords.some(kw=>it.quality.toLowerCase().includes(kw)));
+function autoUpgradeAllToQuality(fromQualityKeys, toQuality){
+  const targets=cartItems.filter(it=>fromQualityKeys.includes(it.qualityKey));
   if(!targets.length){showToast('Nicio zonă eligibilă pentru upgrade.');return;}
   const ids=targets.map(it=>it.id);
-  autoUpgradeAllBasic(ids, toQuality);
+  autoUpgradeAllBasic(ids, toQuality, fromQualityKeys[0]);
 }
 
 function showDiscountUnlockPopup(pct, upgradedNames, fromQuality){
@@ -4872,26 +4872,25 @@ function showDiscountUnlockPopup(pct, upgradedNames, fromQuality){
   // Gaseste urmatorul tier de reducere
   const nextTier=DISC_TIERS.find(t=>t.pct>pct);
 
-  // Buton urmator pas de upgrade
+  // Buton urmator pas de upgrade — folosim qualityKey (mai fiabil decat textul)
   let nextStepHtml='';
-  const proItems=cartItems.filter(it=>it.quality&&(it.quality.toLowerCase().includes('pro')||it.quality.toLowerCase().includes('luxury')));
 
-  if(fromQuality==='basic'&&pct<10){
-    // Am trecut la Pro → oferta Luxury
-    const proOnlyItems=cartItems.filter(it=>it.quality&&(it.quality.toLowerCase().includes('pro')&&!it.quality.toLowerCase().includes('luxury')));
+  if(fromQuality==='basic'){
+    // Am trecut la Pro → oferta Luxury pentru toate zonele Pro
+    const proOnlyItems=cartItems.filter(it=>it.qualityKey==='pro');
     if(proOnlyItems.length){
       const luxIds=JSON.stringify(proOnlyItems.map(it=>it.id));
       nextStepHtml=`
         <div style="margin-top:14px;padding:12px;background:#f8f0ff;border:1.5px solid #9c27b0;border-radius:10px">
           <div style="font-size:12px;font-weight:800;color:#6a1b9a;margin-bottom:4px">🏆 Vrei -10% reducere?</div>
-          <div style="font-size:11px;color:#555;margin-bottom:8px">Treci toate zonele la <strong>Luxury</strong> — un singur click și obții cea mai mare reducere disponibilă.</div>
-          <button onclick="document.getElementById('discount-unlock-popup').remove();autoUpgradeAllBasic(${luxIds},'luxury')"
-            style="width:100%;padding:11px;background:#8e44ad;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
+          <div style="font-size:11px;color:#555;margin-bottom:8px">Treci toate <strong>${proOnlyItems.length} zone</strong> la <strong>Luxury</strong> — un singur click și obții reducerea maximă disponibilă.</div>
+          <button onclick="document.getElementById('discount-unlock-popup').remove();autoUpgradeAllBasic(${luxIds},'luxury','pro')"
+            style="width:100%;padding:12px;background:#8e44ad;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
             ⭐ Upgrade la Luxury → obțin -10% →
           </button>
         </div>`;
     }
-  } else if(fromQuality==='pro'&&pct>=10&&propulsion!=='ev'){
+  } else if(fromQuality==='pro'&&propulsion!=='ev'){
     // Am trecut la Luxury → oferta EV Electra
     const wKg=calcCartTotalWeightKg();
     const evSaving=wKg>0?Math.round(calcFuelStats(wKg*0.3).costRON):0;
@@ -4971,7 +4970,7 @@ function addZoneToCart(skipCarCheck, forceReplace){
   }
   cartItems.push({
     zone:currentZone,zoneName:nextZoneName,layers:currentLayers,
-    quality:nextQualityName,car,area,total,lines,
+    quality:nextQualityName,qualityKey:currentQuality,car,area,total,lines,
     id:Date.now(),carLabel,bodyClassName:bi2.name,bodyIcon:bi2.icon,
     variantLabel:getCurrentVehicleVariantLabel(),propulsion,vehicleKey:getCurrentVehicleKey()
   });
@@ -5425,7 +5424,7 @@ function addZoneToCartTrunk(skipCarCheck, forceReplace){
   }
   cartItems.push({
     zone:subId,zoneName:`${t('portbagajPrefix')}${sz.name}`,layers:currentLayers,
-    quality:nextQualityName,car:`${selBrand} ${selModel}`,area,total,lines,
+    quality:nextQualityName,qualityKey:currentQuality,car:`${selBrand} ${selModel}`,area,total,lines,
     id:Date.now(),carLabel,bodyClassName:bi2.name,bodyIcon:bi2.icon,
     variantLabel:getCurrentVehicleVariantLabel(),propulsion,vehicleKey:getCurrentVehicleKey()
   });
