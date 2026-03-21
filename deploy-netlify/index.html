@@ -669,7 +669,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .version-prompt.show{display:block}
 .version-prompt-title{font-size:12px;font-weight:900;color:var(--red);letter-spacing:.2px}
 .version-prompt-copy{font-size:12px;line-height:1.5;margin-top:5px}
-.body-type-btns-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.body-type-btns-wrap{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 body[data-theme="dark"] .version-prompt{
   background:linear-gradient(180deg,#312022 0%,#23191b 100%);
   border-color:#6a3433;
@@ -1000,6 +1000,10 @@ body.desktop-flow .desktop-step.is-info .desktop-step-nr{background:#eaded1;colo
   .package-switch-title{font-size:24px}
   .package-switch-actions{grid-template-columns:1fr}
 }
+
+@keyframes bodyTypePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(214,48,49,.4)}50%{transform:scale(1.06);box-shadow:0 0 0 8px rgba(214,48,49,0)}}
+.btype-pulse{animation:bodyTypePulse 1.2s ease-in-out 3;}
+@keyframes fadeInUp{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 </style>
 </head>
 <body class="desktop-flow step-1">
@@ -3860,15 +3864,18 @@ function renderBodyTypeSelector(defaultBodyClass){
       const key='sv'+i;
       const vt=o.variantType||'null';
       return `<button onclick="setBodyType('${o.bodyClass}','${key}','${vt==='null'?'':o.variantType||''}')" id="btype-${key}"
-        style="padding:6px 12px;border:1.5px solid var(--border);
-        border-radius:20px;background:#fff;
-        font-size:11px;font-weight:700;cursor:pointer;transition:all .15s">
-        ${o.icon} ${o.label}
+        class="btype-pulse"
+        style="padding:13px 18px;border:2px solid var(--border);border-radius:14px;background:#fff;
+        font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:72px">
+        <span style="font-size:28px;line-height:1">${o.icon}</span>
+        <span>${o.label}</span>
       </button>`;
     }).join('');
     row.style.display='block';
     versionSelectionRequired=true;
     versionConfirmed=false;
+    // Scroll smooth la body type selection pe mobile
+    setTimeout(()=>{const r=document.getElementById('body-type-row');if(r) r.scrollIntoView({behavior:'smooth',block:'center'});},150);
     updateVersionPrompt();
     return;
   }
@@ -3889,8 +3896,25 @@ function setBodyType(newBodyClass, key, variantType){
     b.style.border='1.5px solid var(--border)';
     b.style.background='#fff';
   });
-  const btn=document.getElementById('btype-'+key);
-  if(btn){btn.style.border='1.5px solid var(--red)';btn.style.background='#fff0ee';}
+  // Collapse: ascunde ceilalti butoni, arata doar cel selectat mic
+  document.querySelectorAll('#body-type-btns button').forEach(b=>{
+    b.classList.remove('btype-pulse');
+    if(b.id==='btype-'+key){
+      // Selectat — transforma in badge compact
+      b.style.padding='6px 14px';
+      b.style.fontSize='12px';
+      b.style.flexDirection='row';
+      b.style.gap='6px';
+      b.style.minWidth='';
+      b.style.border='2px solid var(--red)';
+      b.style.background='#fff0ee';
+      b.style.color='var(--red)';
+      const iconEl=b.querySelector('span:first-child');
+      if(iconEl) iconEl.style.fontSize='16px';
+    } else {
+      b.style.display='none'; // ascunde ceilalti
+    }
+  });
   setGuide(null);
   updateVersionPrompt();
   refreshDesktopStepUI();
