@@ -2409,7 +2409,7 @@ const carDB = {
   "Leon":["hatchback",2000,2024],"Tarraco":["suv_large",2018,2024],"Toledo":["sedan",2004,2019],
   "Mii":["hatchback",2012,2019]
 },
-"Škoda":{
+"Skoda":{
   "Citigo":["hatchback",2011,2020],"Enyaq":["suv_medium",2020,2024],"Fabia":["hatchback",1999,2024],
   "Karoq":["suv_medium",2017,2024],"Kodiaq":["suv_large",2016,2024],"Octavia":["sedan",1996,2024],
   "Rapid":["sedan",2012,2019],"Scala":["hatchback",2019,2024],"Superb":["large_sedan",2001,2024]
@@ -2492,7 +2492,7 @@ const UNDER_20K_NEW_MODELS={
   "Peugeot":["108","208"],
   "Renault":["Clio","Twingo"],
   "Seat":["Ibiza","Mii"],
-  "Škoda":["Citigo","Fabia","Rapid"],
+  "Skoda":["Citigo","Fabia","Rapid"],
   "Skoda":["Citigo","Fabia","Rapid"],
   "Suzuki":["Swift"],
   "Toyota":["Aygo","Aygo X"],
@@ -3135,7 +3135,7 @@ const EV_ONLY_MODELS={
 // Modele care necesită demontarea tablei intermediare + macaralei de geam pentru acces tabla exterioară ușă
 // Format: { brand: [ {model, yearFrom?, yearTo?} ] }  sau null = toate modelele brandului
 const DOOR_DISASSEMBLY_MODELS={
-  "Škoda":         [{model:"Octavia",yearFrom:2004,yearTo:2013}], // Octavia gen 2
+  "Skoda":         [{model:"Octavia",yearFrom:2004,yearTo:2013}], // Octavia gen 2
   "Skoda":         [{model:"Octavia",yearFrom:2004,yearTo:2013}], // fallback fără diacritic
   "Volkswagen":    [
     {model:"Tiguan",yearFrom:2007,yearTo:2016},   // gen 1 (5N)
@@ -3592,7 +3592,7 @@ function bounceCart(){
   // Dezactiveaza pinii la start (propulsion nesetat)
   setTimeout(applyPinDisabledState, 50);
   const sb=document.getElementById("sel-brand");
-  Object.keys(carDB).sort().forEach(b=>{const o=document.createElement("option");o.value=b;o.textContent=b;sb.appendChild(o);});
+  Object.keys(carDB).sort((a,b)=>a.localeCompare(b,'ro',{sensitivity:'base'})).forEach(b=>{const o=document.createElement("option");o.value=b;o.textContent=b;sb.appendChild(o);});
   // right-col e acum drawer — controlat manual
   // Initializare sesiune persistenta
   initSession();
@@ -3713,7 +3713,7 @@ const bodyTypeVariants=[
 
 function getSpecificVariantsForCurrentModel(){
   if(carVariants[selBrand]&&carVariants[selBrand][selModel]) return carVariants[selBrand][selModel];
-  if(selBrand==="Škoda"&&carVariants["Skoda"]&&carVariants["Skoda"][selModel]) return carVariants["Skoda"][selModel];
+  if(selBrand==="Skoda"&&carVariants["Skoda"]&&carVariants["Skoda"][selModel]) return carVariants["Skoda"][selModel];
   return null;
 }
 
